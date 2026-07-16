@@ -1,0 +1,20 @@
+profile:
+  weightKg: 80
+
+timer:
+  shortActivityMaxSeconds: 30
+  shortWarningSeconds: 3
+  standardWarningSeconds: 5
+
+met:
+  default: 2.5
+  categories:
+    prayer: 1.5
+    warmUp: 4.0
+    relaxation: 2.0
+    core: 5.0
+    asanas: 4.0
+    coolDown: 2.5
+    pranayama: 2.0
+    meditation: 1.3
+  activities: {}

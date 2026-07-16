@@ -1,0 +1,6 @@
+---
+description: Yogasana practice companion project conventions
+alwaysApply: true
+---
+
+Follow `AGENTS.md` as the source of truth. This is a GitHub Pages static React app: day-aware schedule, localStorage check-offs, no auto timer. Keep schedule data aligned with `Yogasana_schedule.pdf` (2560s total). Run `npm test` and `npm run build` after logic changes.
