@@ -1,8 +1,8 @@
-# Yogasana Practice Companion
+# YOGUIDE — Your Yoga Guide
 
 Static web app for a personal ~43-minute daily yoga/fitness schedule. It supports both manual check-offs and an optional voice-guided session with activity timers, fixed controls, and estimated calories.
 
-Source schedule: [`Yogasana_schedule.pdf`](./Yogasana_schedule.pdf).
+The versioned schedule data lives in [`src/data/schedule.ts`](./src/data/schedule.ts).
 
 ## Develop
 
@@ -34,10 +34,10 @@ Voice uses the browser Web Speech API. If it is unavailable, visible timers and 
 
 ## Deploy (GitHub Pages)
 
-1. Create a GitHub repo named `yoga-schedule` (or change `VITE_BASE` in `.github/workflows/pages.yml` to match).
+1. Use the GitHub repository named `yoguide`.
 2. Push `main`.
 3. Repo **Settings → Pages → Source: GitHub Actions**.
-4. Site URL: `https://<user>.github.io/yoga-schedule/`
+4. Site URL: `https://govindarajanv.github.io/yoguide/`
 
 ## Agents
 
