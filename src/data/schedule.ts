@@ -1,6 +1,6 @@
 import type { StepDef } from '../lib/types'
 
-/** Ordered session from Yogasana_schedule.pdf — ~2560s / ~43 min */
+/** Ordered session — ~2680s / ~45 min */
 export const SCHEDULE_STEPS: StepDef[] = [
   {
     id: 'beginning-prayer',
@@ -187,6 +187,15 @@ export const SCHEDULE_STEPS: StepDef[] = [
     },
   },
   {
+    id: 'suptakapotasana-a',
+    category: 'core',
+    name: 'Suptakapotasana',
+    sets: 1,
+    reps: 2,
+    durationSec: 60,
+    cue: '30 seconds each side; square the hips and breathe steadily.',
+  },
+  {
     id: 'agnisara',
     category: 'relaxation',
     name: 'Agnisara',
@@ -194,6 +203,15 @@ export const SCHEDULE_STEPS: StepDef[] = [
     reps: 60,
     durationSec: 60,
     cue: 'Gentle abdominal flutters; never strain the breath.',
+  },
+  {
+    id: 'side-lunge',
+    category: 'core',
+    name: 'Side Lunge',
+    sets: 1,
+    reps: 2,
+    durationSec: 60,
+    cue: '30 seconds each side; knee over ankle, torso tall.',
   },
   {
     id: 'core-6',
@@ -220,7 +238,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     durationSec: 90,
     cue: 'Smooth reps; keep hips level.',
     nameByDay: {
-      sun: 'Suptakapotasana',
+      sun: 'Leg Swings',
       mon: 'Leg Swings',
       tue: 'Mountain Climbers',
       wed: 'Leg Swings',

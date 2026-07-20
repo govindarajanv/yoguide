@@ -35,6 +35,7 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   'Wall Sit': { primary: 'Quadriceps', secondary: ['Glutes', 'Calves', 'Core'] },
   'Kick - Legs': { primary: 'Hip flexors', secondary: ['Quadriceps', 'Core'] },
   Suptakapotasana: { primary: 'Outer hips', secondary: ['Glutes', 'Lower back'] },
+  'Side Lunge': { primary: 'Inner thighs & glutes', secondary: ['Quadriceps', 'Hip flexors', 'Core'] },
   'Leg Swings': { primary: 'Hip mobility', secondary: ['Hamstrings', 'Hip flexors', 'Glutes'] },
   'Mountain Climbers': { primary: 'Core', secondary: ['Shoulders', 'Hip flexors', 'Cardiovascular system'] },
   'Cat and Cow Pose': { primary: 'Spinal mobility', secondary: ['Core', 'Neck', 'Shoulders'] },

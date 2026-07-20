@@ -77,7 +77,10 @@ export function Practice({
 
       {groups.map((group) => (
         <div key={`${group.category}-${group.steps[0]?.id}`} className="cat-block">
-          <h2 className="cat-title">{CATEGORY_LABELS[group.category]}</h2>
+          <div className="cat-head">
+            <h2 className="cat-title">{CATEGORY_LABELS[group.category]}</h2>
+            <p className="cat-duration">{formatDuration(totalDurationSec(group.steps))}</p>
+          </div>
           <ul className="step-list">
             {group.steps.map((step) => {
               const checked = !!progress[step.id]
