@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_APP_CONFIG } from '../config/appConfig'
 import { createInitialGuidedState } from '../hooks/guidedSessionReducer'
 import type { PracticeStep } from './types'
 import {
@@ -33,8 +34,53 @@ describe('guided persistence', () => {
   it('round-trips a valid versioned snapshot', () => {
     const storage = memoryStorage()
     const state = { ...createInitialGuidedState(steps), status: 'paused' as const }
-    expect(saveGuidedSnapshot('2026-07-16', state, storage)).toBe(true)
-    expect(loadGuidedSnapshot('2026-07-16', steps, storage)).toEqual(state)
+    expect(saveGuidedSnapshot('2026-07-16', state, storage, 1_000)).toBe(true)
+    expect(loadGuidedSnapshot('2026-07-16', steps, storage, DEFAULT_APP_CONFIG, 1_000)).toEqual(
+      state,
+    )
+  })
+
+  it('restores a running session with elapsed time reconciled after backgrounding', () => {
+    const storage = memoryStorage()
+    const runningState = {
+      ...createInitialGuidedState(steps),
+      status: 'running' as const,
+      runningSinceMs: 0,
+      activityRemainingMs: 10_000,
+    }
+    storage.setItem(
+      'yoga-schedule:guided:v1:locked',
+      JSON.stringify({ version: 1, savedAtMs: 5_000, state: runningState }),
+    )
+
+    const restored = loadGuidedSnapshot(
+      'locked',
+      steps,
+      storage,
+      DEFAULT_APP_CONFIG,
+      8_000,
+    )
+
+    expect(restored?.status).toBe('running')
+    expect(restored?.activityRemainingMs).toBe(2_000)
+    expect(restored?.totalActiveMs).toBe(8_000)
+  })
+
+  it('restores announcing sessions as paused', () => {
+    const storage = memoryStorage()
+    const announcingState = {
+      ...createInitialGuidedState(steps),
+      status: 'announcing' as const,
+      runningSinceMs: null,
+    }
+    saveGuidedSnapshot('2026-07-16', announcingState, storage, 1_000)
+    expect(loadGuidedSnapshot('2026-07-16', steps, storage, DEFAULT_APP_CONFIG, 1_000)).toEqual({
+      ...announcingState,
+      status: 'paused',
+      pendingWarning: null,
+      justCompletedStepIds: [],
+      resumeAfterStop: null,
+    })
   })
 
   it('rejects corrupt and incompatible snapshots', () => {

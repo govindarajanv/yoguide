@@ -1,4 +1,6 @@
-import type { GuidedSessionState, GuidedStatus } from '../hooks/guidedSessionReducer'
+import type { AppConfig } from '../config/appConfig'
+import { DEFAULT_APP_CONFIG } from '../config/appConfig'
+import { reconcileAt, type GuidedSessionState, type GuidedStatus } from '../hooks/guidedSessionReducer'
 import type { PracticeStep } from './types'
 
 const PREFIX = 'yoga-schedule:guided:v1:'
@@ -46,18 +48,16 @@ function validateState(value: unknown, steps: PracticeStep[]): GuidedSessionStat
   const elapsedEntries = Object.entries(state.activeElapsedByStep)
   if (elapsedEntries.some(([, elapsed]) => !finiteNonNegative(elapsed))) return null
 
-  const restoredStatus: GuidedStatus =
-    state.status === 'running' || state.status === 'announcing' || state.status === 'stop-confirmation'
-      ? 'paused'
-      : state.status
-
   return {
-    status: restoredStatus,
+    status: state.status!,
     activityIndex: state.activityIndex!,
     activityRemainingMs: state.activityRemainingMs,
     totalActiveMs: state.totalActiveMs,
     activeElapsedByStep: state.activeElapsedByStep,
-    runningSinceMs: null,
+    runningSinceMs:
+      typeof state.runningSinceMs === 'number' && Number.isFinite(state.runningSinceMs)
+        ? state.runningSinceMs
+        : null,
     warningEmitted: Boolean(state.warningEmitted),
     pendingWarning: null,
     justCompletedStepIds: [],
@@ -65,18 +65,74 @@ function validateState(value: unknown, steps: PracticeStep[]): GuidedSessionStat
   }
 }
 
+function pauseForRestore(state: GuidedSessionState): GuidedSessionState {
+  return {
+    ...state,
+    status: 'paused',
+    runningSinceMs: null,
+    pendingWarning: null,
+    justCompletedStepIds: [],
+    resumeAfterStop: null,
+  }
+}
+
+function restoreRunningSession(
+  state: GuidedSessionState,
+  steps: PracticeStep[],
+  config: AppConfig,
+  savedAtMs: number,
+  nowMs: number,
+): GuidedSessionState {
+  const anchorMs = state.runningSinceMs ?? savedAtMs
+  const atSave = reconcileAt({ ...state, status: 'running', runningSinceMs: anchorMs }, savedAtMs, steps, config)
+  if (atSave.state.status === 'completed') {
+    return { ...atSave.state, justCompletedStepIds: [] }
+  }
+
+  const atNow = reconcileAt(
+    { ...atSave.state, status: 'running', runningSinceMs: savedAtMs },
+    nowMs,
+    steps,
+    config,
+  )
+  return { ...atNow.state, justCompletedStepIds: [] }
+}
+
 export function loadGuidedSnapshot(
   dateKey: string,
   steps: PracticeStep[],
   storage: StorageLike | null = browserStorage(),
+  config: AppConfig = DEFAULT_APP_CONFIG,
+  nowMs: number = Date.now(),
 ): GuidedSessionState | null {
   if (!storage) return null
   try {
     const raw = storage.getItem(`${PREFIX}${dateKey}`)
     if (!raw) return null
-    const snapshot = JSON.parse(raw) as { version?: unknown; state?: unknown }
+    const snapshot = JSON.parse(raw) as {
+      version?: unknown
+      savedAtMs?: unknown
+      state?: unknown
+    }
     if (snapshot.version !== VERSION) return null
-    return validateState(snapshot.state, steps)
+
+    const validated = validateState(snapshot.state, steps)
+    if (!validated) return null
+
+    const savedAtMs =
+      typeof snapshot.savedAtMs === 'number' && Number.isFinite(snapshot.savedAtMs)
+        ? snapshot.savedAtMs
+        : nowMs
+
+    if (validated.status === 'running') {
+      return restoreRunningSession(validated, steps, config, savedAtMs, nowMs)
+    }
+
+    if (validated.status === 'announcing' || validated.status === 'stop-confirmation') {
+      return pauseForRestore(validated)
+    }
+
+    return validated
   } catch {
     return null
   }
@@ -86,10 +142,14 @@ export function saveGuidedSnapshot(
   dateKey: string,
   state: GuidedSessionState,
   storage: StorageLike | null = browserStorage(),
+  savedAtMs: number = Date.now(),
 ): boolean {
   if (!storage) return false
   try {
-    storage.setItem(`${PREFIX}${dateKey}`, JSON.stringify({ version: VERSION, state }))
+    storage.setItem(
+      `${PREFIX}${dateKey}`,
+      JSON.stringify({ version: VERSION, savedAtMs, state }),
+    )
     return true
   } catch {
     return false

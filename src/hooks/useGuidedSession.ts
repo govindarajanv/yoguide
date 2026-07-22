@@ -24,6 +24,7 @@ import {
   guidedSessionReducer,
   type GuidedSessionState,
 } from './guidedSessionReducer'
+import { useScreenWakeLock } from './useScreenWakeLock'
 
 type Options = {
   steps: PracticeStep[]
@@ -66,6 +67,9 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   const currentStep = steps[state.activityIndex] ?? null
   const calories = calculateSessionCalories(steps, state.activeElapsedByStep, APP_CONFIG)
+  const sessionActive = state.status === 'running' || state.status === 'announcing'
+
+  useScreenWakeLock(sessionActive)
 
   const announceAndRun = useCallback(
     async (step: PracticeStep, resume = false) => {
@@ -122,10 +126,16 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   useEffect(() => {
     if (state.status !== 'running') return
-    const timer = window.setInterval(() => {
-      dispatch({ type: 'TICK', nowMs: Date.now(), steps, config: APP_CONFIG })
-    }, 250)
-    return () => window.clearInterval(timer)
+    const tick = () => dispatch({ type: 'TICK', nowMs: Date.now(), steps, config: APP_CONFIG })
+    const timer = window.setInterval(tick, 250)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') tick()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [state.status, steps])
 
   useEffect(() => {
