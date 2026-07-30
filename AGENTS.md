@@ -4,7 +4,7 @@ Canonical instructions for **any** coding agent (Claude, Cursor, Codex, Copilot,
 
 ## Product
 
-Personal static SPA that helps follow a ~43-minute daily yoga/fitness schedule stored in `src/data/schedule.ts`.
+Personal static SPA that helps follow a ~47-minute daily yoga/fitness schedule stored in `src/data/schedule.ts`.
 
 **Locked product decisions:**
 
@@ -53,8 +53,8 @@ For local root hosting: `VITE_BASE=/ npm run dev`
 ## Data rules
 
 - Session order and dosing come from `src/data/schedule.ts` — do not invent exercises
-- Day tracks: Sunday · Mon/Wed/Fri · Tue/Thu/Sat for Core; pranayama rotates as in the sheet
-- Total duration must stay **2560 seconds** unless the schedule requirements change
+- Day tracks: Sun/Tue/Thu/Sat · Mon/Wed/Fri for Core; pranayama rotates as in the sheet
+- Total duration must stay **2820 seconds** unless the schedule requirements change
 - Progress keys: `yoga-schedule:progress:YYYY-MM-DD`, rounds `yoga-schedule:rounds:YYYY-MM-DD`
 - Guided snapshots: `yoga-schedule:guided:v1:YYYY-MM-DD`
 

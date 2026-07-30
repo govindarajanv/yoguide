@@ -1,6 +1,6 @@
 # YOGUIDE — Your Yoga Guide
 
-Static web app for a personal ~43-minute daily yoga/fitness schedule. It supports both manual check-offs and an optional voice-guided session with activity timers, fixed controls, and estimated calories.
+Static web app for a personal ~47-minute daily yoga/fitness schedule. It supports both manual check-offs and an optional voice-guided session with activity timers, fixed controls, and estimated calories.
 
 The versioned schedule data lives in [`src/data/schedule.ts`](./src/data/schedule.ts).
 
