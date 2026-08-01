@@ -36,7 +36,7 @@ export type PracticeStep = {
   rounds?: number
 }
 
-export type DayTrack = 'stts' | 'mwf'
+export type DayTrack = 'sws' | 'mt' | 'tf'
 
 export type DayDiff = {
   stepId: string

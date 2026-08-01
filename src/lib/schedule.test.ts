@@ -14,19 +14,32 @@ describe('planForDay', () => {
     expect(totalDurationSec(plan)).toBe(2400)
   })
 
-  it('uses MWF core track on Monday', () => {
-    const plan = planForDay('mon')
-    expect(trackForDay('mon')).toBe('mwf')
-    expect(plan.find((s) => s.id === 'core-1')?.name).toBe('High Knees')
-    expect(plan.find((s) => s.id === 'core-5')?.name).toBe('Planks')
-    expect(plan.find((s) => s.id === 'core-6')?.name).toBe('Crescent Low Lunge')
-    expect(plan.find((s) => s.id === 'core-8')?.name).toBe('Leg Swings')
+  it('uses the Mon/Thu core track', () => {
+    for (const day of ['mon', 'thu'] as const) {
+      const plan = planForDay(day)
+      expect(trackForDay(day)).toBe('mt')
+      expect(plan.find((s) => s.id === 'core-1')?.name).toBe('High Knees')
+      expect(plan.find((s) => s.id === 'core-5')?.name).toBe('Planks')
+      expect(plan.find((s) => s.id === 'core-6')?.name).toBe('Crescent Low Lunge')
+      expect(plan.find((s) => s.id === 'core-8')?.name).toBe('Leg Swings')
+    }
   })
 
-  it('uses the Sun/Tue/Thu/Sat core track on all four days', () => {
-    for (const day of ['sun', 'tue', 'thu', 'sat'] as const) {
+  it('uses the Sun/Wed/Sat core track', () => {
+    for (const day of ['sun', 'wed', 'sat'] as const) {
       const plan = planForDay(day)
-      expect(trackForDay(day)).toBe('stts')
+      expect(trackForDay(day)).toBe('sws')
+      expect(plan.find((s) => s.id === 'core-1')?.name).toBe('Dead Bug')
+      expect(plan.find((s) => s.id === 'core-5')?.name).toBe('Vrikshasana')
+      expect(plan.find((s) => s.id === 'core-6')?.name).toBe('Side Lunge')
+      expect(plan.find((s) => s.id === 'core-8')?.name).toBe('Mountain Climbers')
+    }
+  })
+
+  it('uses the Tue/Fri core track', () => {
+    for (const day of ['tue', 'fri'] as const) {
+      const plan = planForDay(day)
+      expect(trackForDay(day)).toBe('tf')
       expect(plan.find((s) => s.id === 'core-1')?.name).toBe('Dead Bug')
       expect(plan.find((s) => s.id === 'core-5')?.name).toBe('Vrikshasana')
       expect(plan.find((s) => s.id === 'core-6')?.name).toBe('Side Lunge')
@@ -45,7 +58,10 @@ describe('planForDay', () => {
       'Abdominal Breath -CN/U',
     )
     expect(planForDay('mon').find((s) => s.id === 'cooling-breath')?.name).toBe('Seethkari')
-    expect(planForDay('fri').find((s) => s.id === 'humming-breath')?.name).toBe('AUM BM')
+    expect(planForDay('tue').find((s) => s.id === 'humming-breath')?.name).toBe('Brahmari')
+    expect(planForDay('fri').find((s) => s.id === 'sectional-breath')?.name).toBe(
+      'Shoulder Breath - AM/U',
+    )
   })
 })
 

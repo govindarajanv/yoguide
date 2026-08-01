@@ -38,4 +38,4 @@ Auto timers, voice, video, accounts, PWA install.
 
 ## Data
 
-Ordered steps in `src/data/schedule.ts` (41 steps, 2560 seconds). Day tracks: Sunday / MWF / TTS for Core; pranayama rotation per sheet.
+Ordered steps in `src/data/schedule.ts` (49 steps, 2400 seconds). Day tracks: Sun/Wed/Sat · Mon/Thu · Tue/Fri for Core; pranayama rotation per sheet.

@@ -53,7 +53,7 @@ For local root hosting: `VITE_BASE=/ npm run dev`
 ## Data rules
 
 - Session order and dosing come from `src/data/schedule.ts` — do not invent exercises
-- Day tracks: Sun/Tue/Thu/Sat · Mon/Wed/Fri for Core; pranayama rotates as in the sheet
+- Day tracks: Sun/Wed/Sat · Mon/Thu · Tue/Fri; pranayama rotates as in the sheet
 - Total duration must stay **2400 seconds** unless the schedule requirements change
 - Progress keys: `yoga-schedule:progress:YYYY-MM-DD`, rounds `yoga-schedule:rounds:YYYY-MM-DD`
 - Guided snapshots: `yoga-schedule:guided:v1:YYYY-MM-DD`
