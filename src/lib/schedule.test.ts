@@ -8,10 +8,10 @@ import {
 } from './schedule'
 
 describe('planForDay', () => {
-  it('builds 49 steps totaling 2820 seconds', () => {
+  it('builds 49 steps totaling 2400 seconds', () => {
     const plan = planForDay('mon')
     expect(plan).toHaveLength(49)
-    expect(totalDurationSec(plan)).toBe(2820)
+    expect(totalDurationSec(plan)).toBe(2400)
   })
 
   it('uses MWF core track on Monday', () => {

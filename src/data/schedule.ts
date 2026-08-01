@@ -1,7 +1,7 @@
 import type { StepDef } from '../lib/types'
 
 /**
- * Ordered session — ~2820s / ~47 min.
+ * Ordered session — 2400s / 40 min.
  * Two exercise sets: Sun/Tue/Thu/Sat (sheet "Sun"/"Tue" columns) and
  * Mon/Wed/Fri (sheet "Mon" column). Pranayama keeps its 3-day rotation.
  */
@@ -11,17 +11,17 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'prayer',
     name: 'Beginning Prayer',
     sets: 1,
-    reps: 1,
-    durationSec: 10,
+    reps: 15,
+    durationSec: 15,
     cue: 'Sit tall. Set a calm intention for practice.',
   },
   {
     id: 'neck-rotation',
     category: 'warmUp',
     name: 'Neck Rotation',
-    sets: 4,
+    sets: 6,
     reps: 3,
-    durationSec: 30,
+    durationSec: 18,
     cue: 'Slow and small; never force the range.',
   },
   {
@@ -30,7 +30,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Eye Rotation',
     sets: 6,
     reps: 3,
-    durationSec: 30,
+    durationSec: 18,
     cue: 'Slow eye circles; keep the head still.',
   },
   {
@@ -39,7 +39,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Shoulder Socket Rotation',
     sets: 2,
     reps: 6,
-    durationSec: 30,
+    durationSec: 12,
     cue: 'Roll the shoulder joints through full circles; ribs stay down.',
   },
   {
@@ -48,7 +48,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Vertical Arm Rotation',
     sets: 2,
     reps: 6,
-    durationSec: 30,
+    durationSec: 12,
     cue: 'Sweep straight arms overhead and back; move slowly.',
   },
   {
@@ -57,7 +57,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Arm Circles',
     sets: 2,
     reps: 6,
-    durationSec: 30,
+    durationSec: 12,
     cue: 'Small to large circles both directions; keep knees soft.',
   },
   {
@@ -65,8 +65,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'warmUp',
     name: 'Hand Alternate Raise',
     sets: 2,
-    reps: 6,
-    durationSec: 30,
+    reps: 7,
+    durationSec: 14,
     cue: 'Alternate raising each arm overhead; reach tall through the fingertips.',
   },
   {
@@ -74,8 +74,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'warmUp',
     name: 'Hand Crossover',
     sets: 2,
-    reps: 6,
-    durationSec: 30,
+    reps: 8,
+    durationSec: 16,
     cue: 'Swing arms across the chest; alternate the top arm each rep.',
   },
   {
@@ -84,7 +84,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Wrist Rotation',
     sets: 2,
     reps: 6,
-    durationSec: 30,
+    durationSec: 12,
     cue: 'Slow circles; open and close the fists between sets.',
   },
   {
@@ -93,7 +93,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Finger Stretches',
     sets: 1,
     reps: 6,
-    durationSec: 30,
+    durationSec: 6,
     cue: 'Spread, flex, and gently stretch each finger.',
   },
   {
@@ -102,7 +102,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Torso Twist',
     sets: 1,
     reps: 30,
-    durationSec: 40,
+    durationSec: 30,
     cue: 'Twist from the waist; hips face forward.',
   },
   {
@@ -111,7 +111,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Standing Side Bend',
     sets: 1,
     reps: 30,
-    durationSec: 40,
+    durationSec: 30,
     cue: 'Lengthen up, then bend sideways without collapsing.',
   },
   {
@@ -119,8 +119,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'warmUp',
     name: 'Waist Rotation',
     sets: 2,
-    reps: 6,
-    durationSec: 30,
+    reps: 8,
+    durationSec: 16,
     cue: 'Hands on hips; smooth circles both directions.',
   },
   {
@@ -128,7 +128,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'warmUp',
     name: 'Windmill',
     sets: 2,
-    reps: 6,
+    reps: 15,
     durationSec: 30,
     cue: 'Hinge and sweep the opposite hand toward the foot; stay gentle.',
   },
@@ -137,7 +137,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'warmUp',
     name: 'Ankle Circles',
     sets: 2,
-    reps: 6,
+    reps: 15,
     durationSec: 30,
     cue: 'Point and flex; circle each ankle both ways.',
   },
@@ -146,8 +146,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'relaxation',
     name: 'Dandasana',
     sets: 1,
-    reps: 60,
-    durationSec: 60,
+    reps: 120,
+    durationSec: 120,
     cue: 'Staff pose: legs long, spine tall, shoulders soft.',
   },
   {
@@ -155,7 +155,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'core',
     sets: 2,
     reps: 15,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Stay controlled; brace the midsection lightly.',
     nameByDay: {
       sun: 'Dead Bug',
@@ -172,7 +172,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'core',
     sets: 2,
     reps: 15,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Quality over speed; keep breathing.',
     nameByDay: {
       sun: 'Superman',
@@ -189,7 +189,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'core',
     sets: 2,
     reps: 15,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Land soft; keep a steady rhythm.',
     nameByDay: {
       sun: 'Butt Kickers',
@@ -206,7 +206,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'core',
     sets: 2,
     reps: 15,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Move with control; protect knees and low back.',
     nameByDay: {
       sun: 'Bird Dog',
@@ -249,8 +249,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'relaxation',
     name: 'Agnisara',
     sets: 1,
-    reps: 60,
-    durationSec: 60,
+    reps: 90,
+    durationSec: 90,
     cue: 'Gentle abdominal flutters; never strain the breath.',
   },
   {
@@ -292,7 +292,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'core',
     sets: 2,
     reps: 15,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Smooth reps; keep hips level.',
     nameByDay: {
       sun: 'Mountain Climbers',
@@ -308,9 +308,9 @@ export const SCHEDULE_STEPS: StepDef[] = [
     id: 'cat-cow',
     category: 'core',
     name: 'Cat and Cow Pose',
-    sets: 1,
+    sets: 2,
     reps: 15,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Link breath to spine: inhale open, exhale round.',
   },
   {
@@ -319,7 +319,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Leg Raise',
     sets: 3,
     reps: 10,
-    durationSec: 90,
+    durationSec: 30,
     cue: 'Low back pressed down; lower legs with control.',
   },
   {
@@ -328,15 +328,15 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Bridges',
     sets: 1,
     reps: 30,
-    durationSec: 60,
+    durationSec: 30,
     cue: 'Press through heels; lift hips without flaring ribs.',
   },
   {
     id: 'sukhasana',
     category: 'relaxation',
     sets: 1,
-    reps: 60,
-    durationSec: 60,
+    reps: 90,
+    durationSec: 90,
     cue: 'Easy seat; lengthen the spine, soften the face.',
     nameByDay: {
       sun: 'Relaxation',
@@ -353,8 +353,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'asanas',
     name: 'Surya Namaskar',
     sets: 7,
-    reps: 12,
-    durationSec: 360,
+    reps: 50,
+    durationSec: 350,
     rounds: 7,
     cue: 'Seven smooth rounds of twelve steps; match breath to each transition.',
   },
@@ -382,7 +382,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Crossover Arm Stretch',
     sets: 2,
     reps: 6,
-    durationSec: 30,
+    durationSec: 12,
     cue: 'Draw the arm across the chest; keep the shoulder down.',
   },
   {
@@ -391,7 +391,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Tricep Stretch',
     sets: 2,
     reps: 6,
-    durationSec: 30,
+    durationSec: 12,
     cue: 'Elbow overhead; press gently with the opposite hand.',
   },
   {
@@ -408,8 +408,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'coolDown',
     name: 'Rotator Cuff Stretches',
     sets: 2,
-    reps: 15,
-    durationSec: 30,
+    reps: 30,
+    durationSec: 60,
     cue: 'Gentle rotations and stretches; never push into pain.',
   },
   {
@@ -444,8 +444,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'coolDown',
     name: 'Leg Up the wall',
     sets: 2,
-    reps: 120,
-    durationSec: 240,
+    reps: 150,
+    durationSec: 300,
     cue: 'Hips near the wall; legs soft, breath slow.',
   },
   {
@@ -470,8 +470,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     id: 'sectional-breath',
     category: 'pranayama',
     sets: 1,
-    reps: 6,
-    durationSec: 30,
+    reps: 12,
+    durationSec: 12,
     cue: 'Fill the named region slowly; exhale completely.',
     nameByDay: {
       sun: 'Abdominal Breath -CN/U',
@@ -488,16 +488,16 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'pranayama',
     name: 'Naadi Shuddhi (U)',
     sets: 2,
-    reps: 6,
-    durationSec: 120,
+    reps: 30,
+    durationSec: 60,
     cue: 'Alternate-nostril rhythm; soft shoulders, even counts.',
   },
   {
     id: 'cooling-breath',
     category: 'pranayama',
     sets: 1,
-    reps: 6,
-    durationSec: 30,
+    reps: 18,
+    durationSec: 18,
     cue: 'Cooling inhale as named; long soft exhale.',
     nameByDay: {
       sun: 'Seethali',
@@ -513,7 +513,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     id: 'humming-breath',
     category: 'pranayama',
     sets: 1,
-    reps: 6,
+    reps: 60,
     durationSec: 60,
     cue: 'Humming exhale; feel vibration in the skull.',
     nameByDay: {
@@ -540,8 +540,8 @@ export const SCHEDULE_STEPS: StepDef[] = [
     category: 'prayer',
     name: 'End Prayer',
     sets: 1,
-    reps: 60,
-    durationSec: 60,
+    reps: 15,
+    durationSec: 15,
     cue: 'Close with gratitude; rise slowly.',
   },
 ]
