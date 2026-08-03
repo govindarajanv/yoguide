@@ -58,6 +58,25 @@ For local root hosting: `VITE_BASE=/ npm run dev`
 - Progress keys: `yoga-schedule:progress:YYYY-MM-DD`, rounds `yoga-schedule:rounds:YYYY-MM-DD`
 - Guided snapshots: `yoga-schedule:guided:v1:YYYY-MM-DD`
 
+## Versioning (strict)
+
+Semantic versioning, format `v[major].[minor].[patch]`. Source of truth is the `VERSION` file at repo root (e.g. `v0.4.0`).
+
+Bump rules per commit:
+
+- `major`: breaking change (removed/changed behavior, incompatible data or snapshot schema)
+- `minor`: backwards-compatible new feature
+- `patch`: bug fix, schedule/content update, docs, or tooling
+
+Every commit **must**:
+
+1. Bump `VERSION` and mirror it in `package.json#version` (`X.Y.Z`, no `v` prefix)
+2. Use the largest change class in the commit (major > minor > patch)
+3. Create a git tag `vX.Y.Z` on the commit
+4. Never reuse, amend, or move an existing tag
+
+The version string is displayed under the brand in `src/components/Home.tsx` via `VERSION?raw` — update it wherever the app renders version info.
+
 ## Do not
 
 - Add accounts or backends

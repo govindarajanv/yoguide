@@ -156,6 +156,19 @@ button:focus-visible {
   letter-spacing: 0.14em;
 }
 
+.brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.brand-version {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
 .week-badge,
 .eyebrow {
   color: var(--muted);

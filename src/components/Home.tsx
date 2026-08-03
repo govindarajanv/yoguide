@@ -1,6 +1,7 @@
 import type { DayDiff, DayId } from '../lib/types'
 import type { GuidedStatus } from '../hooks/guidedSessionReducer'
 import { formatClock } from '../lib/time'
+import version from '../../VERSION?raw'
 import {
   CATEGORY_LABELS,
   DAY_LABELS,
@@ -50,7 +51,10 @@ export function Home({
   return (
     <section className="home">
       <header className="home-masthead">
-        <p className="brand">YOGUIDE <span>— Your Yoga Guide</span></p>
+        <div className="brand-block">
+          <p className="brand">YOGUIDE <span>— Your Yoga Guide</span></p>
+          <span className="brand-version">{version.trim()}</span>
+        </div>
         <span className="week-badge">PERSONAL PRACTICE</span>
       </header>
       <h1 className="home-title">
