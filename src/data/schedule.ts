@@ -427,7 +427,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     name: 'Quadriceps Stretch',
     sets: 2,
     reps: 15,
-    durationSec: 30,
+    durationSec: 34,
     cue: 'Knees together; gentle hold, both sides.',
   },
   {
