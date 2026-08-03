@@ -30,15 +30,13 @@ export function jsDayToDayId(jsDay: number): DayId {
 }
 
 export function trackForDay(day: DayId): DayTrack {
-  if (day === 'mon' || day === 'thu') return 'mt'
-  if (day === 'tue' || day === 'fri') return 'tf'
-  return 'sws'
+  if (day === 'sun' || day === 'tue' || day === 'thu' || day === 'sat') return 'sta'
+  return 'mwf'
 }
 
 export function trackLabel(track: DayTrack): string {
-  if (track === 'mt') return 'Mon / Thu track'
-  if (track === 'tf') return 'Tue / Fri track'
-  return 'Sun / Wed / Sat track'
+  if (track === 'sta') return 'Sun / Tue / Thu / Sat track'
+  return 'Mon / Wed / Fri track'
 }
 
 function resolveName(def: StepDef, day: DayId): string {
