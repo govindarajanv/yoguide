@@ -60,6 +60,8 @@ function validateState(value: unknown, steps: PracticeStep[]): GuidedSessionStat
         : null,
     warningEmitted: Boolean(state.warningEmitted),
     pendingWarning: null,
+    bellEmitted: Boolean(state.bellEmitted),
+    pendingBell: false,
     justCompletedStepIds: [],
     resumeAfterStop: null,
   }

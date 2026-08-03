@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { APP_CONFIG } from '../config/appConfig'
 import { calculateSessionCalories } from '../lib/calories'
+import { playDing } from '../lib/ding'
 import {
   clearGuidedSnapshot,
   loadGuidedSnapshot,
@@ -170,6 +171,12 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
       .speak(`${step.name} ends in ${state.pendingWarning.seconds} seconds.`, voicePreferences)
       .finally(() => dispatch({ type: 'ACK_WARNING' }))
   }, [speech, state.pendingWarning, state.status, steps, voicePreferences])
+
+  useEffect(() => {
+    if (!state.pendingBell || state.status !== 'running') return
+    dispatch({ type: 'ACK_BELL' })
+    playDing()
+  }, [state.pendingBell, state.status])
 
   useEffect(() => {
     if (state.status !== 'completed' || completionAnnounced.current) return

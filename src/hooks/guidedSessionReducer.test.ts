@@ -5,6 +5,7 @@ import {
   createInitialGuidedState,
   guidedSessionReducer,
   reconcileAt,
+  type GuidedSessionState,
 } from './guidedSessionReducer'
 
 const steps: PracticeStep[] = [
@@ -85,6 +86,54 @@ describe('guidedSessionReducer', () => {
     })
     expect(state.totalActiveMs).toBe(15_000)
     expect(state.activityRemainingMs).toBe(15_000)
+  })
+
+  it('flags a midpoint bell for the current activity', () => {
+    let state: GuidedSessionState = {
+      ...createInitialGuidedState(steps),
+      activityIndex: 1,
+      activityRemainingMs: 60_000,
+      status: 'running',
+      runningSinceMs: 0,
+    }
+    state = guidedSessionReducer(state, {
+      type: 'TICK',
+      nowMs: 29_999,
+      steps,
+      config: DEFAULT_APP_CONFIG,
+    })
+    expect(state.bellEmitted).toBe(false)
+    expect(state.pendingBell).toBe(false)
+
+    state = guidedSessionReducer(state, {
+      type: 'TICK',
+      nowMs: 30_000,
+      steps,
+      config: DEFAULT_APP_CONFIG,
+    })
+    expect(state.bellEmitted).toBe(true)
+    expect(state.pendingBell).toBe(true)
+
+    state = guidedSessionReducer(state, { type: 'ACK_BELL' })
+    expect(state.pendingBell).toBe(false)
+    expect(state.bellEmitted).toBe(true)
+  })
+
+  it('rounds the midpoint ding up for odd durations', () => {
+    const oddSteps: PracticeStep[] = [
+      { ...steps[0], id: 'odd', durationSec: 63 },
+      ...steps.slice(1),
+    ]
+    const running: GuidedSessionState = {
+      ...createInitialGuidedState(oddSteps),
+      status: 'running',
+      runningSinceMs: 0,
+    }
+    const before = reconcileAt(running, 31_000, oddSteps, DEFAULT_APP_CONFIG)
+    expect(before.state.pendingBell).toBe(false)
+
+    const after = reconcileAt(running, 32_000, oddSteps, DEFAULT_APP_CONFIG)
+    expect(after.state.pendingBell).toBe(true)
   })
 
   it('uses 3-second warning for short and 5-second warning for long activities', () => {

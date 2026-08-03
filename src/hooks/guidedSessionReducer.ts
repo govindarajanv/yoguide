@@ -24,6 +24,8 @@ export type GuidedSessionState = {
   runningSinceMs: number | null
   warningEmitted: boolean
   pendingWarning: GuidedWarning | null
+  bellEmitted: boolean
+  pendingBell: boolean
   justCompletedStepIds: string[]
   resumeAfterStop: 'running' | 'paused' | null
 }
@@ -34,6 +36,7 @@ export type GuidedSessionAction =
   | { type: 'ANNOUNCEMENT_FINISHED'; nowMs: number }
   | { type: 'TICK'; nowMs: number; steps: PracticeStep[]; config: AppConfig }
   | { type: 'ACK_WARNING' }
+  | { type: 'ACK_BELL' }
   | { type: 'PAUSE'; nowMs: number; steps: PracticeStep[]; config: AppConfig }
   | { type: 'RESUME' }
   | { type: 'REQUEST_STOP'; nowMs: number; steps: PracticeStep[]; config: AppConfig }
@@ -57,6 +60,8 @@ export function createInitialGuidedState(steps: PracticeStep[]): GuidedSessionSt
     runningSinceMs: null,
     warningEmitted: false,
     pendingWarning: null,
+    bellEmitted: false,
+    pendingBell: false,
     justCompletedStepIds: [],
     resumeAfterStop: null,
   }
@@ -66,6 +71,10 @@ function warningSeconds(step: PracticeStep, config: AppConfig): number {
   return step.durationSec <= config.timer.shortActivityMaxSeconds
     ? config.timer.shortWarningSeconds
     : config.timer.standardWarningSeconds
+}
+
+function midpointRemainingSeconds(step: PracticeStep): number {
+  return Math.floor(step.durationSec / 2)
 }
 
 export function reconcileAt(
@@ -83,6 +92,8 @@ export function reconcileAt(
   let activityRemainingMs = state.activityRemainingMs
   let warningEmitted = state.warningEmitted
   let pendingWarning = state.pendingWarning
+  let bellEmitted = state.bellEmitted
+  let pendingBell = state.pendingBell
   let consumedMs = 0
   const completedStepIds: string[] = []
   const activeElapsedByStep = { ...state.activeElapsedByStep }
@@ -96,6 +107,8 @@ export function reconcileAt(
     activityIndex += 1
     warningEmitted = false
     pendingWarning = null
+    bellEmitted = false
+    pendingBell = false
 
     const next = steps[activityIndex]
     if (!next) {
@@ -111,6 +124,8 @@ export function reconcileAt(
           runningSinceMs: null,
           warningEmitted: true,
           pendingWarning: null,
+          bellEmitted: true,
+          pendingBell: false,
           justCompletedStepIds: completedStepIds,
           resumeAfterStop: null,
         },
@@ -135,6 +150,12 @@ export function reconcileAt(
     pendingWarning = { stepId: current.id, seconds: threshold }
   }
 
+  const midpointMs = midpointRemainingSeconds(current) * 1000
+  if (!bellEmitted && activityRemainingMs > 0 && activityRemainingMs <= midpointMs) {
+    bellEmitted = true
+    pendingBell = true
+  }
+
   return {
     completedStepIds,
     state: {
@@ -146,6 +167,8 @@ export function reconcileAt(
       runningSinceMs: nowMs,
       warningEmitted,
       pendingWarning,
+      bellEmitted,
+      pendingBell,
       justCompletedStepIds: completedStepIds,
     },
   }
@@ -167,6 +190,8 @@ export function guidedSessionReducer(
       return reconcileAt(state, action.nowMs, action.steps, action.config).state
     case 'ACK_WARNING':
       return { ...state, pendingWarning: null }
+    case 'ACK_BELL':
+      return { ...state, pendingBell: false }
     case 'PAUSE': {
       const reconciled = reconcileAt(state, action.nowMs, action.steps, action.config).state
       if (reconciled.status === 'completed') return reconciled
