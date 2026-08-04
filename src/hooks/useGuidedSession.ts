@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { APP_CONFIG } from '../config/appConfig'
 import { calculateSessionCalories } from '../lib/calories'
-import { playDing } from '../lib/ding'
+import { playDing, unlockDing } from '../lib/ding'
 import {
   clearGuidedSnapshot,
   loadGuidedSnapshot,
@@ -86,6 +86,7 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
   const start = useCallback(() => {
     const first = steps[state.activityIndex] ?? steps[0]
     if (!first) return
+    unlockDing()
     completionAnnounced.current = false
     announcedIndex.current = state.activityIndex
     dispatch({ type: 'START' })
@@ -99,6 +100,7 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   const resume = useCallback(() => {
     if (!currentStep) return
+    unlockDing()
     announcedIndex.current = state.activityIndex
     dispatch({ type: 'RESUME' })
     void announceAndRun(currentStep, true)

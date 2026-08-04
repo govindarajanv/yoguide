@@ -1,11 +1,27 @@
-export function playDing(): void {
-  if (typeof window === 'undefined') return
+let sharedContext: AudioContext | null = null
+
+function getContext(): AudioContext | null {
+  if (sharedContext) return sharedContext
+  if (typeof window === 'undefined') return null
   const AudioContextCtor =
     window.AudioContext ??
     (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-  if (!AudioContextCtor) return
+  if (!AudioContextCtor) return null
+  sharedContext = new AudioContextCtor()
+  return sharedContext
+}
 
-  const context = new AudioContextCtor()
+/** Call during a user gesture (e.g. the Start tap) so the bell can play later. */
+export function unlockDing(): void {
+  const context = getContext()
+  if (context && context.state === 'suspended') void context.resume()
+}
+
+export function playDing(): void {
+  const context = getContext()
+  if (!context) return
+  if (context.state === 'suspended') void context.resume()
+
   const now = context.currentTime
   const duration = 1.2
   const master = context.createGain()
@@ -33,6 +49,4 @@ export function playDing(): void {
     oscillator.start(now)
     oscillator.stop(now + duration)
   }
-
-  window.setTimeout(() => void context.close(), duration * 1000)
 }
