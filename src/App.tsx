@@ -150,7 +150,11 @@ export default function App() {
           today={today}
           onSelect={setPreviewDay}
           onBack={() => setView('home')}
-          onOpenPractice={() => setView('practice')}
+          onOpenPractice={() => {
+            setSelectedDay(previewDay)
+            guided.reset()
+            setView('practice')
+          }}
         />
     )
   } else {
@@ -196,7 +200,7 @@ export default function App() {
         }}
         onStart={() => setView('practice')}
         onOpenWeek={() => {
-          setPreviewDay(today)
+          setPreviewDay(selectedDay)
           setView('week')
         }}
       />

@@ -921,6 +921,15 @@ button:focus-visible {
 }
 
 @media (max-width: 720px) {
+  .home-masthead {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .day-select-label {
+    display: none;
+  }
+
   .app-with-controller {
     padding-bottom: 15.5rem;
   }
