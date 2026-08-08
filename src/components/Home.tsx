@@ -4,6 +4,7 @@ import { formatClock } from '../lib/time'
 import version from '../../VERSION?raw'
 import {
   CATEGORY_LABELS,
+  DAY_IDS,
   DAY_LABELS,
   formatDuration,
   trackForDay,
@@ -12,6 +13,8 @@ import {
 
 type Props = {
   day: DayId
+  today: DayId
+  onSelectDay: (day: DayId) => void
   totalSec: number
   diffs: DayDiff[]
   checked: number
@@ -28,6 +31,8 @@ type Props = {
 
 export function Home({
   day,
+  today,
+  onSelectDay,
   totalSec,
   diffs,
   checked,
@@ -55,7 +60,24 @@ export function Home({
           <p className="brand">YOGUIDE <span>— Your Yoga Guide</span></p>
           <span className="brand-version">{version.trim()}</span>
         </div>
-        <span className="week-badge">PERSONAL PRACTICE</span>
+        <div className="masthead-actions">
+          <label className="day-select">
+            <span className="day-select-label">Practice day</span>
+            <select
+              value={day}
+              onChange={(event) => onSelectDay(event.target.value as DayId)}
+              aria-label="Practice day"
+            >
+              {DAY_IDS.map((d) => (
+                <option key={d} value={d}>
+                  {DAY_LABELS[d]}
+                  {d === today ? ' (today)' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="week-badge">PERSONAL PRACTICE</span>
+        </div>
       </header>
       <h1 className="home-title">
         {DAY_LABELS[day]}
@@ -87,12 +109,12 @@ export function Home({
             : guidedResumable
               ? 'Resume guided session'
               : guidedComplete
-                ? 'Completed today'
+                ? 'Completed'
                 : 'Start guided session'}
         </button>
       </section>
 
-      <p className="home-meta">{checked}/{totalSteps} activities complete today</p>
+      <p className="home-meta">{checked}/{totalSteps} activities complete</p>
 
       <div className="cta-row">
         <button type="button" className="btn btn-ghost" onClick={onStart}>

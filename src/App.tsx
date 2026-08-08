@@ -9,6 +9,7 @@ import { Week } from './components/Week'
 import { VoiceSettings } from './components/VoiceSettings'
 import { APP_CONFIG } from './config/appConfig'
 import { useGuidedSession } from './hooks/useGuidedSession'
+import type { DayId } from './lib/types'
 import {
   checkedCount,
   completeStep,
@@ -36,13 +37,14 @@ export default function App() {
   const today = useMemo(() => jsDayToDayId(new Date().getDay()), [])
   const dateKey = useMemo(() => localDateKey(), [])
   const [view, setView] = useState<View>('home')
+  const [selectedDay, setSelectedDay] = useState(today)
   const [previewDay, setPreviewDay] = useState(today)
   const [progress, setProgress] = useState<DayProgress>(() => loadProgress(dateKey))
   const [rounds, setRounds] = useState(() => loadRounds(dateKey, 'surya-namaskar'))
   const [complete, setComplete] = useState(() => isSessionComplete(dateKey))
 
-  const practiceSteps = useMemo(() => planForDay(today), [today])
-  const diffs = useMemo(() => diffVsYesterday(today), [today])
+  const practiceSteps = useMemo(() => planForDay(selectedDay), [selectedDay])
+  const diffs = useMemo(() => diffVsYesterday(selectedDay), [selectedDay])
 
   const onGuidedStepComplete = useCallback(
     (stepId: string) => {
@@ -106,6 +108,14 @@ export default function App() {
     setProgress({})
   }, [dateKey, guided])
 
+  const handleSelectDay = useCallback(
+    (day: DayId) => {
+      setSelectedDay(day)
+      guided.reset()
+    },
+    [guided],
+  )
+
   let content
   if (view === 'practice') {
     content = (
@@ -119,7 +129,7 @@ export default function App() {
           onTest={guided.testVoice}
         />
         <Practice
-          day={today}
+          day={selectedDay}
           steps={practiceSteps}
           progress={progress}
           rounds={rounds}
@@ -165,7 +175,9 @@ export default function App() {
           />
         )}
         <Home
-        day={today}
+        day={selectedDay}
+        today={today}
+        onSelectDay={handleSelectDay}
         totalSec={totalDurationSec(practiceSteps)}
         diffs={diffs}
         checked={checkedCount(
