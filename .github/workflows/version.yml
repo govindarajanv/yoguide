@@ -1,0 +1,35 @@
+name: Version check
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify VERSION and package.json are in sync
+        run: |
+          VERSION_FILE=$(tr -d '[:space:]' < VERSION)
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "$VERSION_FILE" != "v${PKG_VERSION}" ]; then
+            echo "Mismatch: VERSION='$VERSION_FILE' but package.json#version='$PKG_VERSION'"
+            exit 1
+          fi
+          echo "Versions in sync: $VERSION_FILE"
+      - name: Verify the vX.Y.Z tag is on this commit
+        run: |
+          VERSION_FILE=$(tr -d '[:space:]' < VERSION)
+          TAG_COMMIT=$(git rev-list -n 1 "refs/tags/$VERSION_FILE" 2>/dev/null || true)
+          HEAD_COMMIT=$(git rev-parse HEAD)
+          if [ -z "$TAG_COMMIT" ] || [ "$TAG_COMMIT" != "$HEAD_COMMIT" ]; then
+            echo "Expected tag $VERSION_FILE on commit $HEAD_COMMIT but it was not found there"
+            exit 1
+          fi
+          echo "Tag $VERSION_FILE is on $HEAD_COMMIT"
