@@ -9,6 +9,7 @@ import { Week } from './components/Week'
 import { VoiceSettings } from './components/VoiceSettings'
 import { APP_CONFIG } from './config/appConfig'
 import { useGuidedSession } from './hooks/useGuidedSession'
+import { useTheme } from './hooks/useTheme'
 import type { DayId } from './lib/types'
 import {
   checkedCount,
@@ -58,6 +59,7 @@ export default function App() {
     dateKey,
     onStepComplete: onGuidedStepComplete,
   })
+  const { theme, toggleTheme } = useTheme()
   const categorySummaries = useMemo(
     () =>
       buildCategorySummaries(practiceSteps, guided.state.activeElapsedByStep, APP_CONFIG),
@@ -140,6 +142,8 @@ export default function App() {
           isComplete={complete}
           guidedCurrentId={guided.currentStep?.id ?? null}
           guidedActive={guided.state.status !== 'idle'}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
       </>
     )
@@ -150,6 +154,8 @@ export default function App() {
           today={today}
           onSelect={setPreviewDay}
           onBack={() => setView('home')}
+          theme={theme}
+          onToggleTheme={toggleTheme}
           onOpenPractice={() => {
             setSelectedDay(previewDay)
             guided.reset()
@@ -203,6 +209,8 @@ export default function App() {
           setPreviewDay(selectedDay)
           setView('week')
         }}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
       </>
     )

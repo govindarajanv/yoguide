@@ -1,7 +1,9 @@
 import type { DayDiff, DayId } from '../lib/types'
 import type { GuidedStatus } from '../hooks/guidedSessionReducer'
+import type { Theme } from '../hooks/useTheme'
 import { formatClock } from '../lib/time'
 import version from '../../VERSION?raw'
+import { ThemeToggle } from './ThemeToggle'
 import {
   CATEGORY_LABELS,
   DAY_IDS,
@@ -27,6 +29,8 @@ type Props = {
   onResumeGuided: () => void
   onStart: () => void
   onOpenWeek: () => void
+  theme: Theme
+  onToggleTheme: () => void
 }
 
 export function Home({
@@ -45,6 +49,8 @@ export function Home({
   onResumeGuided,
   onStart,
   onOpenWeek,
+  theme,
+  onToggleTheme,
 }: Props) {
   const track = trackForDay(day)
   const coreDiffs = diffs.filter((d) => d.category === 'core')
@@ -76,6 +82,7 @@ export function Home({
               ))}
             </select>
           </label>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           <span className="week-badge">PERSONAL PRACTICE</span>
         </div>
       </header>

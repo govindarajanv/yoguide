@@ -22,7 +22,10 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   'Torso Twist': { primary: 'Obliques', secondary: ['Spine', 'Core'] },
   'Standing Side Bend': { primary: 'Side body', secondary: ['Obliques', 'Lats'] },
   'Waist Rotation': { primary: 'Core mobility', secondary: ['Obliques', 'Lower back'] },
-  Dandasana: { primary: 'Postural muscles', secondary: ['Hamstrings', 'Core', 'Spine'] },
+  'Sciatica Nerve Flossing': {
+    primary: 'Sciatic nerve glide',
+    secondary: ['Hamstrings', 'Lower back', 'Hips'],
+  },
   'Dead Bug': { primary: 'Deep core', secondary: ['Hip flexors', 'Lower back stability'] },
   'High Knees': { primary: 'Hip flexors', secondary: ['Quadriceps', 'Core', 'Calves'] },
   Superman: { primary: 'Lower back', secondary: ['Glutes', 'Upper back'] },

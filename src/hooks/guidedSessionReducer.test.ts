@@ -4,6 +4,7 @@ import type { PracticeStep } from '../lib/types'
 import {
   createInitialGuidedState,
   guidedSessionReducer,
+  initDingForStep,
   reconcileAt,
   type GuidedSessionState,
 } from './guidedSessionReducer'
@@ -89,10 +90,13 @@ describe('guidedSessionReducer', () => {
   })
 
   it('flags a midpoint bell for the current activity', () => {
+    const ding = initDingForStep(steps[1])
     let state: GuidedSessionState = {
       ...createInitialGuidedState(steps),
       activityIndex: 1,
       activityRemainingMs: 60_000,
+      dingIntervalMs: ding.dingIntervalMs,
+      nextDingRemainingMs: ding.nextDingRemainingMs,
       status: 'running',
       runningSinceMs: 0,
     }
@@ -102,7 +106,7 @@ describe('guidedSessionReducer', () => {
       steps,
       config: DEFAULT_APP_CONFIG,
     })
-    expect(state.bellEmitted).toBe(false)
+    expect(state.nextDingRemainingMs).toBe(30_000)
     expect(state.pendingBell).toBe(false)
 
     state = guidedSessionReducer(state, {
@@ -111,12 +115,11 @@ describe('guidedSessionReducer', () => {
       steps,
       config: DEFAULT_APP_CONFIG,
     })
-    expect(state.bellEmitted).toBe(true)
+    expect(state.nextDingRemainingMs).toBeNull()
     expect(state.pendingBell).toBe(true)
 
     state = guidedSessionReducer(state, { type: 'ACK_BELL' })
     expect(state.pendingBell).toBe(false)
-    expect(state.bellEmitted).toBe(true)
   })
 
   it('rounds the midpoint ding up for odd durations', () => {
@@ -134,6 +137,48 @@ describe('guidedSessionReducer', () => {
 
     const after = reconcileAt(running, 32_000, oddSteps, DEFAULT_APP_CONFIG)
     expect(after.state.pendingBell).toBe(true)
+  })
+
+  it('rings every 30 seconds for interval activities and only once otherwise', () => {
+    const suryaSteps: PracticeStep[] = [
+      {
+        id: 'surya-namaskar',
+        category: 'asanas',
+        name: 'Surya Namaskar',
+        sets: 1,
+        reps: 1,
+        durationSec: 120,
+        cue: 'Flow.',
+        dingIntervalSec: 30,
+      },
+      ...steps.slice(1),
+    ]
+    let state: GuidedSessionState = {
+      ...createInitialGuidedState(suryaSteps),
+      status: 'running',
+      runningSinceMs: 0,
+    }
+    expect(state.dingIntervalMs).toBe(30_000)
+    expect(state.nextDingRemainingMs).toBe(90_000)
+
+    const at30 = reconcileAt(state, 30_000, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(at30.state.pendingBell).toBe(true)
+    expect(at30.state.nextDingRemainingMs).toBe(60_000)
+
+    state = { ...at30.state, pendingBell: false }
+    const at60 = reconcileAt(state, 60_000, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(at60.state.pendingBell).toBe(true)
+    expect(at60.state.nextDingRemainingMs).toBe(30_000)
+
+    state = { ...at60.state, pendingBell: false }
+    const at90 = reconcileAt(state, 90_000, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(at90.state.pendingBell).toBe(true)
+    expect(at90.state.nextDingRemainingMs).toBeNull()
+
+    state = { ...at90.state, pendingBell: false }
+    const at91 = reconcileAt(state, 91_000, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(at91.state.pendingBell).toBe(false)
+    expect(at91.state.nextDingRemainingMs).toBeNull()
   })
 
   it('uses 3-second warning for short and 5-second warning for long activities', () => {

@@ -24,7 +24,10 @@ export type GuidedSessionState = {
   runningSinceMs: number | null
   warningEmitted: boolean
   pendingWarning: GuidedWarning | null
-  bellEmitted: boolean
+  /** 0 = single midpoint ding, >0 = ding every N ms */
+  dingIntervalMs: number
+  /** Next activity-remaining-ms threshold that triggers a ding; null = none */
+  nextDingRemainingMs: number | null
   pendingBell: boolean
   justCompletedStepIds: string[]
   resumeAfterStop: 'running' | 'paused' | null
@@ -51,6 +54,7 @@ export type ReconcileResult = {
 }
 
 export function createInitialGuidedState(steps: PracticeStep[]): GuidedSessionState {
+  const ding = initDingForStep(steps[0])
   return {
     status: 'idle',
     activityIndex: 0,
@@ -60,7 +64,8 @@ export function createInitialGuidedState(steps: PracticeStep[]): GuidedSessionSt
     runningSinceMs: null,
     warningEmitted: false,
     pendingWarning: null,
-    bellEmitted: false,
+    dingIntervalMs: ding.dingIntervalMs,
+    nextDingRemainingMs: ding.nextDingRemainingMs,
     pendingBell: false,
     justCompletedStepIds: [],
     resumeAfterStop: null,
@@ -73,8 +78,20 @@ function warningSeconds(step: PracticeStep, config: AppConfig): number {
     : config.timer.standardWarningSeconds
 }
 
-function midpointRemainingSeconds(step: PracticeStep): number {
-  return Math.floor(step.durationSec / 2)
+export function initDingForStep(
+  step: PracticeStep | undefined,
+): { dingIntervalMs: number; nextDingRemainingMs: number | null } {
+  if (!step) return { dingIntervalMs: 0, nextDingRemainingMs: null }
+  const intervalSec = step.dingIntervalSec ?? 0
+  if (intervalSec > 0) {
+    const intervalMs = intervalSec * 1000
+    return {
+      dingIntervalMs: intervalMs,
+      nextDingRemainingMs: Math.max(1, step.durationSec * 1000 - intervalMs),
+    }
+  }
+  const midpointMs = Math.floor(step.durationSec / 2) * 1000
+  return { dingIntervalMs: 0, nextDingRemainingMs: midpointMs > 0 ? midpointMs : null }
 }
 
 export function reconcileAt(
@@ -92,7 +109,8 @@ export function reconcileAt(
   let activityRemainingMs = state.activityRemainingMs
   let warningEmitted = state.warningEmitted
   let pendingWarning = state.pendingWarning
-  let bellEmitted = state.bellEmitted
+  let dingIntervalMs = state.dingIntervalMs
+  let nextDingRemainingMs = state.nextDingRemainingMs
   let pendingBell = state.pendingBell
   let consumedMs = 0
   const completedStepIds: string[] = []
@@ -107,7 +125,6 @@ export function reconcileAt(
     activityIndex += 1
     warningEmitted = false
     pendingWarning = null
-    bellEmitted = false
     pendingBell = false
 
     const next = steps[activityIndex]
@@ -124,7 +141,8 @@ export function reconcileAt(
           runningSinceMs: null,
           warningEmitted: true,
           pendingWarning: null,
-          bellEmitted: true,
+          dingIntervalMs: 0,
+          nextDingRemainingMs: null,
           pendingBell: false,
           justCompletedStepIds: completedStepIds,
           resumeAfterStop: null,
@@ -132,6 +150,9 @@ export function reconcileAt(
       }
     }
 
+    const nextDing = initDingForStep(next)
+    dingIntervalMs = nextDing.dingIntervalMs
+    nextDingRemainingMs = nextDing.nextDingRemainingMs
     activityRemainingMs = Math.max(1, next.durationSec * 1000)
   }
 
@@ -150,10 +171,16 @@ export function reconcileAt(
     pendingWarning = { stepId: current.id, seconds: threshold }
   }
 
-  const midpointMs = midpointRemainingSeconds(current) * 1000
-  if (!bellEmitted && activityRemainingMs > 0 && activityRemainingMs <= midpointMs) {
-    bellEmitted = true
-    pendingBell = true
+  if (nextDingRemainingMs !== null && activityRemainingMs > 0) {
+    while (nextDingRemainingMs !== null && activityRemainingMs <= nextDingRemainingMs) {
+      pendingBell = true
+      if (dingIntervalMs > 0) {
+        const nextThreshold: number = nextDingRemainingMs - dingIntervalMs
+        nextDingRemainingMs = nextThreshold > 0 ? nextThreshold : null
+      } else {
+        nextDingRemainingMs = null
+      }
+    }
   }
 
   return {
@@ -167,7 +194,8 @@ export function reconcileAt(
       runningSinceMs: nowMs,
       warningEmitted,
       pendingWarning,
-      bellEmitted,
+      dingIntervalMs,
+      nextDingRemainingMs,
       pendingBell,
       justCompletedStepIds: completedStepIds,
     },

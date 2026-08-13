@@ -23,6 +23,17 @@ const hold30: PracticeStep = {
   cue: 'Hold.',
 }
 
+const suryaNamaskar: PracticeStep = {
+  id: 'surya-namaskar',
+  category: 'asanas',
+  name: 'Surya Namaskar',
+  sets: 1,
+  reps: 1,
+  durationSec: 120,
+  cue: 'Flow.',
+  dingIntervalSec: 30,
+}
+
 beforeEach(() => {
   vi.useFakeTimers()
   vi.setSystemTime(1_000_000)
@@ -49,7 +60,7 @@ describe('useGuidedSession midpoint bell', () => {
     await act(async () => {
       vi.advanceTimersByTime(15_000)
     })
-    expect(result.current.state.bellEmitted).toBe(true)
+    expect(result.current.state.nextDingRemainingMs).toBeNull()
     expect(mockPlayDing).toHaveBeenCalledTimes(1)
   })
 
@@ -79,5 +90,43 @@ describe('useGuidedSession midpoint bell', () => {
       vi.advanceTimersByTime(29_000)
     })
     expect(mockPlayDing).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useGuidedSession Surya Namaskar interval ding', () => {
+  it('rings every 30 seconds only during Surya Namaskar', async () => {
+    const { result } = renderHook(() =>
+      useGuidedSession({
+        steps: [suryaNamaskar],
+        dateKey: '2026-01-05',
+        onStepComplete: vi.fn(),
+      }),
+    )
+
+    await act(async () => {
+      result.current.start()
+    })
+    expect(result.current.state.dingIntervalMs).toBe(30_000)
+
+    await act(async () => {
+      vi.advanceTimersByTime(29_000)
+    })
+    expect(mockPlayDing).not.toHaveBeenCalled()
+
+    await act(async () => {
+      vi.advanceTimersByTime(1_000)
+    })
+    expect(mockPlayDing).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      vi.advanceTimersByTime(30_000)
+    })
+    expect(mockPlayDing).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      vi.advanceTimersByTime(30_000)
+    })
+    expect(mockPlayDing).toHaveBeenCalledTimes(3)
+    expect(result.current.state.nextDingRemainingMs).toBeNull()
   })
 })

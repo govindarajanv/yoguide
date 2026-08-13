@@ -55,6 +55,7 @@ export function planForDay(day: DayId): PracticeStep[] {
     durationSec: def.durationSec,
     cue: def.cue,
     rounds: def.rounds,
+    dingIntervalSec: def.dingIntervalSec,
   }))
 }
 

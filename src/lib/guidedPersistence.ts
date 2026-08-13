@@ -1,6 +1,11 @@
 import type { AppConfig } from '../config/appConfig'
 import { DEFAULT_APP_CONFIG } from '../config/appConfig'
-import { reconcileAt, type GuidedSessionState, type GuidedStatus } from '../hooks/guidedSessionReducer'
+import {
+  initDingForStep,
+  reconcileAt,
+  type GuidedSessionState,
+  type GuidedStatus,
+} from '../hooks/guidedSessionReducer'
 import type { PracticeStep } from './types'
 
 const PREFIX = 'yoga-schedule:guided:v1:'
@@ -48,6 +53,9 @@ function validateState(value: unknown, steps: PracticeStep[]): GuidedSessionStat
   const elapsedEntries = Object.entries(state.activeElapsedByStep)
   if (elapsedEntries.some(([, elapsed]) => !finiteNonNegative(elapsed))) return null
 
+  const step = steps[Math.min(state.activityIndex!, steps.length)]
+  const ding = initDingForStep(step)
+
   return {
     status: state.status!,
     activityIndex: state.activityIndex!,
@@ -60,7 +68,14 @@ function validateState(value: unknown, steps: PracticeStep[]): GuidedSessionStat
         : null,
     warningEmitted: Boolean(state.warningEmitted),
     pendingWarning: null,
-    bellEmitted: Boolean(state.bellEmitted),
+    dingIntervalMs:
+      typeof state.dingIntervalMs === 'number' && Number.isFinite(state.dingIntervalMs)
+        ? state.dingIntervalMs
+        : ding.dingIntervalMs,
+    nextDingRemainingMs:
+      typeof state.nextDingRemainingMs === 'number' && Number.isFinite(state.nextDingRemainingMs)
+        ? state.nextDingRemainingMs
+        : ding.nextDingRemainingMs,
     pendingBell: false,
     justCompletedStepIds: [],
     resumeAfterStop: null,

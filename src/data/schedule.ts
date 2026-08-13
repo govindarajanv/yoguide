@@ -144,11 +144,11 @@ export const SCHEDULE_STEPS: StepDef[] = [
   {
     id: 'dandasana',
     category: 'relaxation',
-    name: 'Dandasana',
+    name: 'Sciatica Nerve Flossing',
     sets: 1,
     reps: 120,
     durationSec: 120,
-    cue: 'Staff pose: legs long, spine tall, shoulders soft.',
+    cue: 'Seated with legs long, flex one foot and gently nod the chin down, then point and lift the gaze to glide the sciatic nerve.',
   },
   {
     id: 'core-1',
@@ -356,6 +356,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     reps: 30,
     durationSec: 220,
     rounds: 7,
+    dingIntervalSec: 30,
     cue: 'Seven smooth rounds of twelve steps; match breath to each transition.',
   },
   {

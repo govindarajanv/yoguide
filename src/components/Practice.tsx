@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { DayId, PracticeStep } from '../lib/types'
+import type { Theme } from '../hooks/useTheme'
+import { ThemeToggle } from './ThemeToggle'
 import {
   CATEGORY_LABELS,
   DAY_LABELS,
@@ -21,6 +23,8 @@ type Props = {
   isComplete: boolean
   guidedCurrentId: string | null
   guidedActive: boolean
+  theme: Theme
+  onToggleTheme: () => void
 }
 
 function formatDose(step: PracticeStep): string {
@@ -40,6 +44,8 @@ export function Practice({
   isComplete,
   guidedCurrentId,
   guidedActive,
+  theme,
+  onToggleTheme,
 }: Props) {
   const groups = groupByCategory(steps)
   const currentId = guidedActive ? guidedCurrentId : steps.find((s) => !progress[s.id])?.id
@@ -63,9 +69,12 @@ export function Practice({
             {done}/{steps.length} · {formatDuration(totalDurationSec(steps))}
           </span>
         </div>
-        <button type="button" className="btn btn-ghost" onClick={onMarkDone}>
-          {isComplete ? 'Done ✓' : 'Mark done'}
-        </button>
+        <div className="masthead-actions">
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          <button type="button" className="btn btn-ghost" onClick={onMarkDone}>
+            {isComplete ? 'Done ✓' : 'Mark done'}
+          </button>
+        </div>
       </header>
 
       {currentId && !guidedActive && (

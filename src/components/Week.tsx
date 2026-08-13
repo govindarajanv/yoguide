@@ -1,4 +1,6 @@
 import type { DayId } from '../lib/types'
+import type { Theme } from '../hooks/useTheme'
+import { ThemeToggle } from './ThemeToggle'
 import {
   DAY_IDS,
   DAY_LABELS,
@@ -15,9 +17,11 @@ type Props = {
   onSelect: (day: DayId) => void
   onBack: () => void
   onOpenPractice: () => void
+  theme: Theme
+  onToggleTheme: () => void
 }
 
-export function Week({ selected, today, onSelect, onBack, onOpenPractice }: Props) {
+export function Week({ selected, today, onSelect, onBack, onOpenPractice, theme, onToggleTheme }: Props) {
   const renderDayContent = (day: DayId) => {
     const plan = planForDay(day)
     const previewCore = plan
@@ -52,9 +56,12 @@ export function Week({ selected, today, onSelect, onBack, onOpenPractice }: Prop
           Home
         </button>
         <strong>Week</strong>
-        <button type="button" className="btn btn-ghost" onClick={onOpenPractice}>
-          Practice
-        </button>
+        <div className="masthead-actions">
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          <button type="button" className="btn btn-ghost" onClick={onOpenPractice}>
+            Practice
+          </button>
+        </div>
       </header>
 
       <div className="week-chips" role="tablist" aria-label="Days of week">

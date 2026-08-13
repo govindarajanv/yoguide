@@ -23,6 +23,8 @@ export type StepDef = {
   nameByDay?: Partial<Record<DayId, string>>
   /** Manual round helper (Surya Namaskar) */
   rounds?: number
+  /** Repeat a ding every N seconds instead of a single midpoint ding */
+  dingIntervalSec?: number
 }
 
 export type PracticeStep = {
@@ -34,6 +36,7 @@ export type PracticeStep = {
   durationSec: number
   cue: string
   rounds?: number
+  dingIntervalSec?: number
 }
 
 export type DayTrack = 'sta' | 'mwf'
