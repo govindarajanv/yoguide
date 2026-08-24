@@ -65,6 +65,10 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
   )
   const announcedIndex = useRef<number | null>(null)
   const completionAnnounced = useRef(false)
+  const dingGains = useMemo(
+    () => Array.from(new Set(steps.map((step) => step.dingGain ?? 1))),
+    [steps],
+  )
 
   const currentStep = steps[state.activityIndex] ?? null
   const calories = calculateSessionCalories(steps, state.activeElapsedByStep, APP_CONFIG)
@@ -86,12 +90,12 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
   const start = useCallback(() => {
     const first = steps[state.activityIndex] ?? steps[0]
     if (!first) return
-    unlockDing()
+    unlockDing(dingGains)
     completionAnnounced.current = false
     announcedIndex.current = state.activityIndex
     dispatch({ type: 'START' })
     void announceAndRun(first)
-  }, [announceAndRun, state.activityIndex, steps])
+  }, [announceAndRun, dingGains, state.activityIndex, steps])
 
   const pause = useCallback(() => {
     speech.cancel()
@@ -100,11 +104,11 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   const resume = useCallback(() => {
     if (!currentStep) return
-    unlockDing()
+    unlockDing(dingGains)
     announcedIndex.current = state.activityIndex
     dispatch({ type: 'RESUME' })
     void announceAndRun(currentStep, true)
-  }, [announceAndRun, currentStep, state.activityIndex])
+  }, [announceAndRun, currentStep, dingGains, state.activityIndex])
 
   const requestStop = useCallback(() => {
     speech.cancel()
@@ -177,8 +181,8 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
   useEffect(() => {
     if (!state.pendingBell || state.status !== 'running') return
     dispatch({ type: 'ACK_BELL' })
-    playDing()
-  }, [state.pendingBell, state.status])
+    playDing(currentStep?.dingGain ?? 1)
+  }, [currentStep, state.pendingBell, state.status])
 
   useEffect(() => {
     if (state.status !== 'completed' || completionAnnounced.current) return

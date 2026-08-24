@@ -25,6 +25,8 @@ export type StepDef = {
   rounds?: number
   /** Repeat a ding every N seconds instead of a single midpoint ding */
   dingIntervalSec?: number
+  /** Volume multiplier for the midpoint/interval ding (default 1) */
+  dingGain?: number
 }
 
 export type PracticeStep = {
@@ -37,6 +39,7 @@ export type PracticeStep = {
   cue: string
   rounds?: number
   dingIntervalSec?: number
+  dingGain?: number
 }
 
 export type DayTrack = 'sta' | 'mwf'

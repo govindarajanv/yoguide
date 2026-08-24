@@ -1,5 +1,5 @@
 let sharedContext: AudioContext | null = null
-let audioElement: HTMLAudioElement | null = null
+const audioElements = new Map<number, HTMLAudioElement>()
 
 function getContext(): AudioContext | null {
   if (sharedContext) return sharedContext
@@ -12,7 +12,7 @@ function getContext(): AudioContext | null {
   return sharedContext
 }
 
-function buildBellBlob(): Blob {
+function buildBellBlob(gain: number): Blob {
   const sampleRate = 44_100
   const duration = 1.5
   const samples = Math.floor(sampleRate * duration)
@@ -50,42 +50,52 @@ function buildBellBlob(): Blob {
     for (const partial of partials) {
       wave += partial.gain * Math.sin(2 * Math.PI * partial.frequency * t)
     }
-    const sample = Math.max(-1, Math.min(1, (envelope * wave) / 1.7))
+    const scaled = (envelope * wave * gain) / 1.7
+    const sample = Math.max(-1, Math.min(1, scaled))
     view.setInt16(44 + i * 2, Math.round(sample * 0x7fff), true)
   }
 
   return new Blob([buffer], { type: 'audio/wav' })
 }
 
-function getAudio(): HTMLAudioElement | null {
-  if (audioElement) return audioElement
+function getAudio(gain: number): HTMLAudioElement | null {
+  const key = Math.round(gain * 10)
+  const cached = audioElements.get(key)
+  if (cached) return cached
   if (typeof window === 'undefined' || typeof Audio === 'undefined') return null
   try {
-    const url = URL.createObjectURL(buildBellBlob())
-    audioElement = new Audio(url)
-    audioElement.preload = 'auto'
-    return audioElement
+    const url = URL.createObjectURL(buildBellBlob(gain))
+    const audio = new Audio(url)
+    audio.preload = 'auto'
+    audioElements.set(key, audio)
+    return audio
   } catch {
     return null
   }
 }
 
-/** Call during a user gesture so the bell can play later. */
-export function unlockDing(): void {
-  const audio = getAudio()
-  if (audio && audio.paused) {
-    audio.muted = true
-    void audio
-      .play()
-      .catch(() => {})
-      .then(() => {
-        window.setTimeout(() => {
-          if (!audio.paused) {
-            audio.pause()
-            audio.currentTime = 0
-          }
-        }, 150)
-      })
+/**
+ * Call during a user gesture so the bell can play later. Unlocks every cached
+ * gain variant so any per-activity loudness boost is allowed by autoplay
+ * policies.
+ */
+export function unlockDing(gains: number[] = [1]): void {
+  for (const gain of gains) {
+    const audio = getAudio(gain)
+    if (audio && audio.paused) {
+      audio.muted = true
+      void audio
+        .play()
+        .catch(() => {})
+        .then(() => {
+          window.setTimeout(() => {
+            if (!audio.paused) {
+              audio.pause()
+              audio.currentTime = 0
+            }
+          }, 150)
+        })
+    }
   }
 
   const context = getContext()
@@ -115,10 +125,11 @@ function installGestureUnlock(): void {
   window.addEventListener('touchend', unlock)
 }
 
-export async function playDing(): Promise<void> {
-  const audio = getAudio()
+export async function playDing(gain = 1): Promise<void> {
+  const audio = getAudio(gain)
   if (audio) {
     audio.muted = false
+    audio.volume = Math.min(1, gain)
     audio.currentTime = 0
     try {
       await audio.play()
@@ -143,7 +154,7 @@ export async function playDing(): Promise<void> {
   const duration = 1.2
   const master = context.createGain()
   master.gain.setValueAtTime(0.0001, now)
-  master.gain.exponentialRampToValueAtTime(0.6, now + 0.015)
+  master.gain.exponentialRampToValueAtTime(0.6 * gain, now + 0.015)
   master.gain.exponentialRampToValueAtTime(0.0001, now + duration)
   master.connect(context.destination)
 

@@ -411,6 +411,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     sets: 2,
     reps: 40,
     durationSec: 80,
+    dingGain: 1.6,
     cue: 'Gentle rotations and stretches; never push into pain.',
   },
   {

@@ -34,6 +34,17 @@ const suryaNamaskar: PracticeStep = {
   dingIntervalSec: 30,
 }
 
+const loudStep: PracticeStep = {
+  id: 'loud-hold',
+  category: 'coolDown',
+  name: 'Loud Hold',
+  sets: 1,
+  reps: 1,
+  durationSec: 80,
+  cue: 'Hold.',
+  dingGain: 1.6,
+}
+
 beforeEach(() => {
   vi.useFakeTimers()
   vi.setSystemTime(1_000_000)
@@ -55,6 +66,7 @@ describe('useGuidedSession midpoint bell', () => {
       result.current.start()
     })
     expect(mockUnlockDing).toHaveBeenCalledTimes(1)
+    expect(mockUnlockDing).toHaveBeenCalledWith([1])
     expect(result.current.state.status).toBe('running')
 
     await act(async () => {
@@ -62,6 +74,7 @@ describe('useGuidedSession midpoint bell', () => {
     })
     expect(result.current.state.nextDingRemainingMs).toBeNull()
     expect(mockPlayDing).toHaveBeenCalledTimes(1)
+    expect(mockPlayDing).toHaveBeenCalledWith(1)
   })
 
   it('does not ring before the midpoint', async () => {
@@ -128,5 +141,55 @@ describe('useGuidedSession Surya Namaskar interval ding', () => {
     })
     expect(mockPlayDing).toHaveBeenCalledTimes(3)
     expect(result.current.state.nextDingRemainingMs).toBeNull()
+  })
+})
+
+describe('useGuidedSession loud bell gain', () => {
+  it('unlocks all step gain variants on start', async () => {
+    const { result } = renderHook(() =>
+      useGuidedSession({
+        steps: [hold30, loudStep],
+        dateKey: '2026-01-06',
+        onStepComplete: vi.fn(),
+      }),
+    )
+
+    await act(async () => {
+      result.current.start()
+    })
+    expect(mockUnlockDing).toHaveBeenCalledWith([1, 1.6])
+  })
+
+  it('passes the step dingGain to playDing at the midpoint', async () => {
+    const { result } = renderHook(() =>
+      useGuidedSession({ steps: [loudStep], dateKey: '2026-01-07', onStepComplete: vi.fn() }),
+    )
+
+    await act(async () => {
+      result.current.start()
+    })
+    mockPlayDing.mockClear()
+
+    await act(async () => {
+      vi.advanceTimersByTime(40_000)
+    })
+    expect(mockPlayDing).toHaveBeenCalledTimes(1)
+    expect(mockPlayDing).toHaveBeenCalledWith(1.6)
+  })
+
+  it('keeps the default gain for steps without dingGain', async () => {
+    const { result } = renderHook(() =>
+      useGuidedSession({ steps: [hold30], dateKey: '2026-01-08', onStepComplete: vi.fn() }),
+    )
+
+    await act(async () => {
+      result.current.start()
+    })
+    mockPlayDing.mockClear()
+
+    await act(async () => {
+      vi.advanceTimersByTime(15_000)
+    })
+    expect(mockPlayDing).toHaveBeenCalledWith(1)
   })
 })
