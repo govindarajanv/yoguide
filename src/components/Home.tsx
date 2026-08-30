@@ -4,10 +4,12 @@ import type { Theme } from '../hooks/useTheme'
 import { formatClock } from '../lib/time'
 import version from '../../VERSION?raw'
 import { ThemeToggle } from './ThemeToggle'
+import { BlocksIcon } from './BlocksIcon'
 import {
   CATEGORY_LABELS,
   DAY_IDS,
   DAY_LABELS,
+  blocksForDay,
   formatDuration,
   trackForDay,
   trackLabel,
@@ -55,6 +57,7 @@ export function Home({
   onToggleTheme,
 }: Props) {
   const track = trackForDay(day)
+  const blockCount = blocksForDay(day).length
   const coreDiffs = diffs.filter((d) => d.category === 'core')
   const breathDiffs = diffs.filter((d) => d.category === 'pranayama')
   const guidedRunning = ['announcing', 'running', 'stop-confirmation'].includes(guidedStatus)
@@ -88,10 +91,13 @@ export function Home({
           <span className="week-badge">PERSONAL PRACTICE</span>
         </div>
       </header>
-      <h1 className="home-title">
-        {DAY_LABELS[day]}
-        <span className="home-track">{trackLabel(track)}</span>
-      </h1>
+      <div className="home-heading">
+        <BlocksIcon count={blockCount} />
+        <h1 className="home-title">
+          {DAY_LABELS[day]}
+          <span className="home-track">{trackLabel(track)}</span>
+        </h1>
+      </div>
       <section className="guided-hero">
         <span className="eyebrow">Guided session</span>
         <h2>{guidedComplete ? 'Practice complete.' : 'Ready when you are.'}</h2>

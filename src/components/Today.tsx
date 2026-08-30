@@ -2,6 +2,7 @@ import type { DayId, PracticeStep } from '../lib/types'
 import type { DayProgress } from '../lib/progress'
 import type { Theme } from '../hooks/useTheme'
 import { ThemeToggle } from './ThemeToggle'
+import { BlocksIcon } from './BlocksIcon'
 import {
   DAY_LABELS,
   blocksForDay,
@@ -24,22 +25,6 @@ type Props = {
 function formatDose(step: PracticeStep): string {
   const parts = [`${step.sets}×${step.reps}`, `~${step.durationSec}s`]
   return parts.join(' · ')
-}
-
-function BlocksIcon({ count }: { count: number }) {
-  return (
-    <svg
-      className="blocks-icon"
-      viewBox="0 0 28 30"
-      width="28"
-      height="30"
-      role="img"
-      aria-label={`${count === 2 ? 'Two' : 'One'} practice block${count === 2 ? 's' : ''}`}
-    >
-      <rect x="1" y="1" width="26" height="13" rx="3.5" />
-      {count === 2 && <rect x="1" y="16" width="26" height="13" rx="3.5" />}
-    </svg>
-  )
 }
 
 export function Today({ day, today, progress, onBack, onOpenPractice, theme, onToggleTheme }: Props) {

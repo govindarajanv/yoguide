@@ -272,11 +272,28 @@ button:focus-visible {
   border-radius: 999px;
 }
 
+.home-heading {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin: 3rem 0 1.25rem;
+}
+
+.blocks-icon {
+  fill: currentColor;
+}
+
+.home-heading .blocks-icon {
+  flex: 0 0 auto;
+  width: clamp(2.2rem, 6vw, 3.4rem);
+  height: auto;
+}
+
 .home-title {
   display: flex;
   flex-direction: column;
   gap: 0.22rem;
-  margin: 3rem 0 1.25rem;
+  margin: 0;
   font-size: clamp(2.2rem, 8vw, 4.6rem);
   font-weight: 800;
   letter-spacing: -0.055em;
