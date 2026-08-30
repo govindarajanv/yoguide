@@ -357,6 +357,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     durationSec: 220,
     rounds: 7,
     dingIntervalSec: 30,
+    finalWarningSec: 30,
     cue: 'Seven smooth rounds of twelve steps; match breath to each transition.',
   },
   {

@@ -662,6 +662,54 @@ button:focus-visible {
   gap: 0.4rem;
 }
 
+.today {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.today-heading {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin: 2.6rem 0 0.4rem;
+}
+
+.today-heading .blocks-icon {
+  flex: 0 0 auto;
+  fill: var(--accent);
+}
+
+.today-title {
+  margin: 0.15rem 0 0;
+  font-size: clamp(2.2rem, 8vw, 4.2rem);
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+}
+
+.today-block + .today-block {
+  margin-top: 2rem;
+}
+
+.today-block-title {
+  margin: 0.2rem 0 0;
+  font-size: 1.3rem;
+}
+
+.today-block .step {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.today-block .step-done h3 {
+  text-decoration: line-through;
+}
+
+.today-check {
+  color: var(--accent);
+  font-weight: 800;
+}
+
 .session-controller {
   position: fixed;
   z-index: 50;

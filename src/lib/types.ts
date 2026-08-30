@@ -27,6 +27,8 @@ export type StepDef = {
   dingIntervalSec?: number
   /** Volume multiplier for the midpoint/interval ding (default 1) */
   dingGain?: number
+  /** Override the spoken end-of-activity warning seconds (defaults to config) */
+  finalWarningSec?: number
 }
 
 export type PracticeStep = {
@@ -40,6 +42,7 @@ export type PracticeStep = {
   rounds?: number
   dingIntervalSec?: number
   dingGain?: number
+  finalWarningSec?: number
 }
 
 export type DayTrack = 'sta' | 'mwf'

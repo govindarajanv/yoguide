@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  blocksForDay,
   diffVsYesterday,
   planForDay,
   previousDay,
@@ -67,5 +68,27 @@ describe('diffVsYesterday', () => {
   it('has no core diff between Saturday and Sunday (same track)', () => {
     const diffs = diffVsYesterday('sun')
     expect(diffs.some((d) => d.category === 'core')).toBe(false)
+  })
+})
+
+describe('blocksForDay', () => {
+  it('splits Sun/Tue/Thu/Sat into two blocks at Savasana', () => {
+    for (const day of ['sun', 'tue', 'thu', 'sat'] as const) {
+      const blocks = blocksForDay(day)
+      expect(blocks).toHaveLength(2)
+      expect(blocks[0]?.label).toBe('Block 1')
+      expect(blocks[1]?.label).toBe('Block 2')
+      expect(blocks[0]?.steps.at(-1)?.id).toBe('savasana')
+      expect(blocks[1]?.steps[0]?.id).toBe('hand-stretches')
+    }
+  })
+
+  it('keeps Mon/Wed/Fri as a single block with the full day', () => {
+    for (const day of ['mon', 'wed', 'fri'] as const) {
+      const blocks = blocksForDay(day)
+      expect(blocks).toHaveLength(1)
+      expect(blocks[0]?.steps).toHaveLength(49)
+      expect(totalDurationSec(blocks[0]!.steps)).toBe(2400)
+    }
   })
 })

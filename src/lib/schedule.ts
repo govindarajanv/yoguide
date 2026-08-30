@@ -56,11 +56,40 @@ export function planForDay(day: DayId): PracticeStep[] {
     cue: def.cue,
     rounds: def.rounds,
     dingIntervalSec: def.dingIntervalSec,
+    finalWarningSec: def.finalWarningSec,
   }))
 }
 
 export function totalDurationSec(steps: PracticeStep[]): number {
   return steps.reduce((sum, s) => sum + s.durationSec, 0)
+}
+
+export type PlanBlock = {
+  /** Section label, e.g. "Block 1" or "Practice" */
+  label: string
+  name: string
+  steps: PracticeStep[]
+}
+
+/** Step id where the two-block split lands for Sun/Tue/Thu/Sat routines. */
+export const BLOCK_SPLIT_AFTER_STEP_ID = 'savasana'
+
+/**
+ * Sun/Tue/Thu/Sat run the routine in two blocks — the practice through
+ * Savasana, then the cool-down and breath wind-down. Mon/Wed/Fri show the
+ * whole day as a single block.
+ */
+export function blocksForDay(day: DayId): PlanBlock[] {
+  const plan = planForDay(day)
+  if (trackForDay(day) !== 'sta') {
+    return [{ label: '', name: 'Practice', steps: plan }]
+  }
+  const splitIndex = plan.findIndex((step) => step.id === BLOCK_SPLIT_AFTER_STEP_ID)
+  const endOfFirst = splitIndex >= 0 ? splitIndex + 1 : plan.length
+  return [
+    { label: 'Block 1', name: 'Practice', steps: plan.slice(0, endOfFirst) },
+    { label: 'Block 2', name: 'Wind-down', steps: plan.slice(endOfFirst) },
+  ]
 }
 
 export function formatDuration(totalSec: number): string {

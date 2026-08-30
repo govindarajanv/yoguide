@@ -73,6 +73,7 @@ export function createInitialGuidedState(steps: PracticeStep[]): GuidedSessionSt
 }
 
 function warningSeconds(step: PracticeStep, config: AppConfig): number {
+  if (step.finalWarningSec != null) return step.finalWarningSec
   return step.durationSec <= config.timer.shortActivityMaxSeconds
     ? config.timer.shortWarningSeconds
     : config.timer.standardWarningSeconds
@@ -165,15 +166,19 @@ export function reconcileAt(
   consumedMs += unconsumedMs
   activityRemainingMs = Math.max(0, activityRemainingMs - unconsumedMs)
 
+  let warningJustEmitted = false
   const threshold = warningSeconds(current, config)
   if (!warningEmitted && activityRemainingMs > 0 && activityRemainingMs <= threshold * 1000) {
     warningEmitted = true
+    warningJustEmitted = true
     pendingWarning = { stepId: current.id, seconds: threshold }
   }
 
+  let bellJustTriggered = false
   if (nextDingRemainingMs !== null && activityRemainingMs > 0) {
     while (nextDingRemainingMs !== null && activityRemainingMs <= nextDingRemainingMs) {
       pendingBell = true
+      bellJustTriggered = true
       if (dingIntervalMs > 0) {
         const nextThreshold: number = nextDingRemainingMs - dingIntervalMs
         nextDingRemainingMs = nextThreshold > 0 ? nextThreshold : null
@@ -181,6 +186,10 @@ export function reconcileAt(
         nextDingRemainingMs = null
       }
     }
+  }
+
+  if (warningJustEmitted && bellJustTriggered) {
+    pendingBell = false
   }
 
   return {

@@ -28,6 +28,7 @@ type Props = {
   onOpenGuided: () => void
   onResumeGuided: () => void
   onStart: () => void
+  onOpenToday: () => void
   onOpenWeek: () => void
   theme: Theme
   onToggleTheme: () => void
@@ -48,6 +49,7 @@ export function Home({
   onOpenGuided,
   onResumeGuided,
   onStart,
+  onOpenToday,
   onOpenWeek,
   theme,
   onToggleTheme,
@@ -126,6 +128,9 @@ export function Home({
       <div className="cta-row">
         <button type="button" className="btn btn-ghost" onClick={onStart}>
           Manual practice
+        </button>
+        <button type="button" className="btn btn-ghost" onClick={onOpenToday}>
+          Today's activities
         </button>
         <button type="button" className="btn btn-ghost" onClick={onOpenWeek}>
           Week

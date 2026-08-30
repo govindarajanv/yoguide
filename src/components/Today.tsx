@@ -1,0 +1,122 @@
+import type { DayId, PracticeStep } from '../lib/types'
+import type { DayProgress } from '../lib/progress'
+import type { Theme } from '../hooks/useTheme'
+import { ThemeToggle } from './ThemeToggle'
+import {
+  DAY_LABELS,
+  blocksForDay,
+  formatDuration,
+  totalDurationSec,
+  trackForDay,
+  trackLabel,
+} from '../lib/schedule'
+
+type Props = {
+  day: DayId
+  today: DayId
+  progress: DayProgress
+  onBack: () => void
+  onOpenPractice: () => void
+  theme: Theme
+  onToggleTheme: () => void
+}
+
+function formatDose(step: PracticeStep): string {
+  const parts = [`${step.sets}×${step.reps}`, `~${step.durationSec}s`]
+  return parts.join(' · ')
+}
+
+function BlocksIcon({ count }: { count: number }) {
+  return (
+    <svg
+      className="blocks-icon"
+      viewBox="0 0 28 30"
+      width="28"
+      height="30"
+      role="img"
+      aria-label={`${count === 2 ? 'Two' : 'One'} practice block${count === 2 ? 's' : ''}`}
+    >
+      <rect x="1" y="1" width="26" height="13" rx="3.5" />
+      {count === 2 && <rect x="1" y="16" width="26" height="13" rx="3.5" />}
+    </svg>
+  )
+}
+
+export function Today({ day, today, progress, onBack, onOpenPractice, theme, onToggleTheme }: Props) {
+  const blocks = blocksForDay(day)
+  const totalSteps = blocks.reduce((sum, block) => sum + block.steps.length, 0)
+  const done = blocks.reduce(
+    (sum, block) => sum + block.steps.filter((step) => progress[step.id]).length,
+    0,
+  )
+  const totalSec = blocks.reduce((sum, block) => sum + totalDurationSec(block.steps), 0)
+
+  return (
+    <section className="today">
+      <header className="practice-bar">
+        <button type="button" className="btn btn-ghost" onClick={onBack}>
+          Home
+        </button>
+        <div className="practice-bar-mid">
+          <strong>Today's activities</strong>
+          <span>
+            {day === today ? 'Today · ' : ''}
+            {done}/{totalSteps} · {formatDuration(totalSec).replace('~', '')}
+          </span>
+        </div>
+        <div className="masthead-actions">
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          <button type="button" className="btn btn-ghost" onClick={onOpenPractice}>
+            Practice
+          </button>
+        </div>
+      </header>
+
+      <div className="today-heading">
+        <BlocksIcon count={blocks.length} />
+        <div>
+          <span className="eyebrow">{trackLabel(trackForDay(day))}</span>
+          <h1 className="today-title">{DAY_LABELS[day]}</h1>
+        </div>
+      </div>
+
+      <p className="week-note">
+        {blocks.length === 2
+          ? 'Sun / Tue / Thu / Sat routine — two practice blocks.'
+          : 'Mon / Wed / Fri routine — one practice block.'}
+      </p>
+
+      {blocks.map((block) => (
+        <div key={block.label || block.name} className="today-block">
+          <div className="cat-head">
+            {block.label && <p className="eyebrow">{block.label}</p>}
+            <h2 className="today-block-title">{block.name}</h2>
+            <p className="cat-duration">{formatDuration(totalDurationSec(block.steps)).replace('~', '')}</p>
+          </div>
+          <ul className="step-list">
+            {block.steps.map((step) => {
+              const checked = !!progress[step.id]
+              return (
+                <li
+                  key={step.id}
+                  className={['step', checked ? 'step-done' : ''].filter(Boolean).join(' ')}
+                >
+                  <div className="step-body">
+                    <div className="step-head">
+                      <h3>
+                        {checked && <span className="today-check">✓ </span>}
+                        {step.name}
+                      </h3>
+                      <span className="step-dose">{formatDose(step)}</span>
+                    </div>
+                    <p className="step-cue">{step.cue}</p>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      ))}
+    </section>
+  )
+}

@@ -144,8 +144,31 @@ describe('useGuidedSession Surya Namaskar interval ding', () => {
   })
 })
 
-describe('useGuidedSession loud bell gain', () => {
-  it('unlocks all step gain variants on start', async () => {
+describe('useGuidedSession 30s Surya Namaskar warning', () => {
+  it('skips the ding that lands on the same tick as the spoken 30s warning', async () => {
+    const step: PracticeStep = { ...suryaNamaskar, durationSec: 60, finalWarningSec: 30 }
+    const { result } = renderHook(() =>
+      useGuidedSession({ steps: [step], dateKey: '2026-01-09', onStepComplete: vi.fn() }),
+    )
+
+    await act(async () => {
+      result.current.start()
+    })
+    expect(result.current.state.pendingWarning).toBeNull()
+
+    await act(async () => {
+      vi.advanceTimersByTime(29_000)
+    })
+    expect(mockPlayDing).not.toHaveBeenCalled()
+
+    await act(async () => {
+      vi.advanceTimersByTime(1_000)
+    })
+    expect(mockPlayDing).not.toHaveBeenCalled()
+  })
+})
+
+describe('useGuidedSession loud bell gain', () => {  it('unlocks all step gain variants on start', async () => {
     const { result } = renderHook(() =>
       useGuidedSession({
         steps: [hold30, loudStep],

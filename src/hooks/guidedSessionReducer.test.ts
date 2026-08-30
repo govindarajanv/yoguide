@@ -209,6 +209,63 @@ describe('guidedSessionReducer', () => {
     expect(long.pendingWarning?.seconds).toBe(5)
   })
 
+  it('honors a per-step finalWarningSec override (Surya Namaskar at 30s)', () => {
+    const suryaSteps: PracticeStep[] = [
+      {
+        id: 'surya-namaskar',
+        category: 'asanas',
+        name: 'Surya Namaskar',
+        sets: 1,
+        reps: 1,
+        durationSec: 220,
+        cue: 'Flow.',
+        dingIntervalSec: 30,
+        finalWarningSec: 30,
+      },
+      ...steps.slice(1),
+    ]
+    const running: GuidedSessionState = {
+      ...createInitialGuidedState(suryaSteps),
+      status: 'running',
+      runningSinceMs: 0,
+    }
+
+    const before = reconcileAt(running, 189_999, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(before.state.pendingWarning).toBeNull()
+
+    const at30 = reconcileAt(running, 190_000, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(at30.state.pendingWarning?.stepId).toBe('surya-namaskar')
+    expect(at30.state.pendingWarning?.seconds).toBe(30)
+  })
+
+  it('skips the ding when the spoken 30s warning lands on the same tick', () => {
+    const suryaSteps: PracticeStep[] = [
+      {
+        id: 'surya-namaskar',
+        category: 'asanas',
+        name: 'Surya Namaskar',
+        sets: 1,
+        reps: 1,
+        durationSec: 60,
+        cue: 'Flow.',
+        dingIntervalSec: 30,
+        finalWarningSec: 30,
+      },
+      ...steps.slice(1),
+    ]
+    const running: GuidedSessionState = {
+      ...createInitialGuidedState(suryaSteps),
+      status: 'running',
+      runningSinceMs: 0,
+    }
+    expect(running.nextDingRemainingMs).toBe(30_000)
+
+    const at31 = reconcileAt(running, 31_000, suryaSteps, DEFAULT_APP_CONFIG)
+    expect(at31.state.pendingWarning?.seconds).toBe(30)
+    expect(at31.state.pendingBell).toBe(false)
+    expect(at31.state.nextDingRemainingMs).toBeNull()
+  })
+
   it('reconciles delayed ticks across multiple completed activities', () => {
     const running = {
       ...createInitialGuidedState(steps),

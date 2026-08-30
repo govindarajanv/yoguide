@@ -5,6 +5,7 @@ import { Practice } from './components/Practice'
 import { SessionController } from './components/SessionController'
 import { SessionSummary } from './components/SessionSummary'
 import { StopSessionDialog } from './components/StopSessionDialog'
+import { Today } from './components/Today'
 import { Week } from './components/Week'
 import { VoiceSettings } from './components/VoiceSettings'
 import { APP_CONFIG } from './config/appConfig'
@@ -32,7 +33,7 @@ import {
 } from './lib/schedule'
 import { buildCategorySummaries } from './lib/sessionAnalytics'
 
-type View = 'home' | 'practice' | 'week'
+type View = 'home' | 'practice' | 'week' | 'today'
 
 export default function App() {
   const today = useMemo(() => jsDayToDayId(new Date().getDay()), [])
@@ -163,6 +164,18 @@ export default function App() {
           }}
         />
     )
+  } else if (view === 'today') {
+    content = (
+      <Today
+        day={selectedDay}
+        today={today}
+        progress={progress}
+        onBack={() => setView('home')}
+        onOpenPractice={() => setView('practice')}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
+    )
   } else {
     content = (
       <>
@@ -205,6 +218,7 @@ export default function App() {
           guided.resume()
         }}
         onStart={() => setView('practice')}
+        onOpenToday={() => setView('today')}
         onOpenWeek={() => {
           setPreviewDay(selectedDay)
           setView('week')
