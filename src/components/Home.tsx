@@ -80,13 +80,13 @@ export function Home({
             type="button"
             role="switch"
             aria-checked={travelMode}
-            aria-label="Toggle Chair Yoga travel mode"
+            aria-label="Toggle travel mode"
             className={`travel-toggle ${travelMode ? 'travel-toggle-active' : ''}`}
             onClick={onToggleTravelMode}
-            title={travelMode ? 'Switch to regular practice' : 'Switch to Chair Yoga (Travel mode)'}
+            title={travelMode ? 'Turn travel mode off' : 'Turn travel mode on (Chair Yoga)'}
           >
-            <span className="travel-toggle-icon">🪑</span>
-            <span className="travel-toggle-label">Chair Yoga</span>
+            <span className="travel-toggle-icon">✈️</span>
+            <span className="travel-toggle-label">Travel mode</span>
             <span className={`travel-toggle-badge ${travelMode ? 'badge-on' : 'badge-off'}`}>
               {travelMode ? 'ON' : 'OFF'}
             </span>

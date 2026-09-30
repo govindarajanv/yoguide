@@ -30,7 +30,7 @@ describe('Home Travel Mode Toggle', () => {
 
   it('renders with travel mode OFF by default and shows existing app', () => {
     render(<Home {...baseProps} />)
-    const toggle = screen.getByRole('switch', { name: 'Toggle Chair Yoga travel mode' })
+    const toggle = screen.getByRole('switch', { name: 'Toggle travel mode' })
     expect(toggle).toBeInTheDocument()
     expect(toggle).toHaveAttribute('aria-checked', 'false')
     expect(screen.getByText('OFF')).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('Home Travel Mode Toggle', () => {
   it('calls onToggleTravelMode when clicking the Chair Yoga toggle', () => {
     const onToggleTravelMode = vi.fn()
     render(<Home {...baseProps} onToggleTravelMode={onToggleTravelMode} />)
-    const toggle = screen.getByRole('switch', { name: 'Toggle Chair Yoga travel mode' })
+    const toggle = screen.getByRole('switch', { name: 'Toggle travel mode' })
     fireEvent.click(toggle)
     expect(onToggleTravelMode).toHaveBeenCalledTimes(1)
   })
@@ -56,7 +56,7 @@ describe('Home Travel Mode Toggle', () => {
         totalSteps={31}
       />,
     )
-    const toggle = screen.getByRole('switch', { name: 'Toggle Chair Yoga travel mode' })
+    const toggle = screen.getByRole('switch', { name: 'Toggle travel mode' })
     expect(toggle).toHaveAttribute('aria-checked', 'true')
     expect(screen.getByText('ON')).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1, name: /Chair Yoga/i })).toBeInTheDocument()
