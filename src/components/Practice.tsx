@@ -16,6 +16,7 @@ type Props = {
   steps: PracticeStep[]
   progress: DayProgress
   rounds: number
+  travelMode?: boolean
   onToggle: (stepId: string) => void
   onRounds: (next: number) => void
   onBack: () => void
@@ -37,6 +38,7 @@ export function Practice({
   steps,
   progress,
   rounds,
+  travelMode = false,
   onToggle,
   onRounds,
   onBack,
@@ -64,7 +66,7 @@ export function Practice({
           Home
         </button>
         <div className="practice-bar-mid">
-          <strong>{DAY_LABELS[day]}</strong>
+          <strong>{travelMode ? 'Chair Yoga' : DAY_LABELS[day]}</strong>
           <span>
             {done}/{steps.length} · {formatDuration(totalDurationSec(steps))}
           </span>

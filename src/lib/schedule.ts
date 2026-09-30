@@ -1,4 +1,5 @@
 import { SCHEDULE_STEPS } from '../data/schedule'
+import { CHAIR_YOGA_STEPS } from '../data/chairYogaSchedule'
 import type { Category, DayDiff, DayId, DayTrack, PracticeStep, StepDef } from './types'
 
 export const DAY_IDS: DayId[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
@@ -60,6 +61,22 @@ export function planForDay(day: DayId): PracticeStep[] {
   }))
 }
 
+export function chairYogaPlan(): PracticeStep[] {
+  return CHAIR_YOGA_STEPS.map((def) => ({
+    id: def.id,
+    category: def.category,
+    name: def.name ?? '',
+    sets: def.sets,
+    reps: def.reps,
+    durationSec: def.durationSec,
+    cue: def.cue,
+    rounds: def.rounds,
+    dingIntervalSec: def.dingIntervalSec,
+    dingGain: def.dingGain,
+    finalWarningSec: def.finalWarningSec,
+  }))
+}
+
 export function totalDurationSec(steps: PracticeStep[]): number {
   return steps.reduce((sum, s) => sum + s.durationSec, 0)
 }
@@ -85,6 +102,16 @@ export function blocksForDay(day: DayId): PlanBlock[] {
     return [{ label: '', name: 'Practice', steps: plan }]
   }
   const splitIndex = plan.findIndex((step) => step.id === BLOCK_SPLIT_AFTER_STEP_ID)
+  const endOfFirst = splitIndex >= 0 ? splitIndex + 1 : plan.length
+  return [
+    { label: 'Block 1', name: 'Practice', steps: plan.slice(0, endOfFirst) },
+    { label: 'Block 2', name: 'Wind-down', steps: plan.slice(endOfFirst) },
+  ]
+}
+
+export function blocksForChairYoga(): PlanBlock[] {
+  const plan = chairYogaPlan()
+  const splitIndex = plan.findIndex((step) => step.id === 'chair-savasana')
   const endOfFirst = splitIndex >= 0 ? splitIndex + 1 : plan.length
   return [
     { label: 'Block 1', name: 'Practice', steps: plan.slice(0, endOfFirst) },

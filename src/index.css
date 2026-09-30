@@ -266,6 +266,64 @@ button:focus-visible {
   cursor: pointer;
 }
 
+.travel-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition: all 160ms ease;
+  user-select: none;
+}
+
+.travel-toggle:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.travel-toggle-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--hero-glow);
+}
+
+.travel-toggle-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.travel-toggle-label {
+  font-weight: 700;
+}
+
+.travel-toggle-badge {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.travel-toggle-badge.badge-off {
+  background: var(--subtle-bg);
+  color: var(--muted);
+}
+
+.travel-toggle-badge.badge-on {
+  background: var(--accent);
+  color: #fff;
+}
+
 .week-badge {
   padding: 0.42rem 0.7rem;
   border: 1px solid var(--line-strong);

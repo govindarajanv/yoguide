@@ -26,6 +26,8 @@ type Props = {
   guidedStatus: GuidedStatus
   guidedElapsedMs: number
   guidedCalories: number
+  travelMode: boolean
+  onToggleTravelMode: () => void
   onStartGuided: () => void
   onOpenGuided: () => void
   onResumeGuided: () => void
@@ -47,6 +49,8 @@ export function Home({
   guidedStatus,
   guidedElapsedMs,
   guidedCalories,
+  travelMode,
+  onToggleTravelMode,
   onStartGuided,
   onOpenGuided,
   onResumeGuided,
@@ -57,9 +61,9 @@ export function Home({
   onToggleTheme,
 }: Props) {
   const track = trackForDay(day)
-  const blockCount = blocksForDay(day).length
-  const coreDiffs = diffs.filter((d) => d.category === 'core')
-  const breathDiffs = diffs.filter((d) => d.category === 'pranayama')
+  const blockCount = travelMode ? 2 : blocksForDay(day).length
+  const coreDiffs = travelMode ? [] : diffs.filter((d) => d.category === 'core')
+  const breathDiffs = travelMode ? [] : diffs.filter((d) => d.category === 'pranayama')
   const guidedRunning = ['announcing', 'running', 'stop-confirmation'].includes(guidedStatus)
   const guidedResumable = guidedStatus === 'paused' || guidedStatus === 'saved'
   const guidedComplete = guidedStatus === 'completed'
@@ -72,30 +76,49 @@ export function Home({
           <span className="brand-version">{version.trim()}</span>
         </div>
         <div className="masthead-actions">
-          <label className="day-select">
-            <span className="day-select-label">Practice day</span>
-            <select
-              value={day}
-              onChange={(event) => onSelectDay(event.target.value as DayId)}
-              aria-label="Practice day"
-            >
-              {DAY_IDS.map((d) => (
-                <option key={d} value={d}>
-                  {DAY_LABELS[d]}
-                  {d === today ? ' (today)' : ''}
-                </option>
-              ))}
-            </select>
-          </label>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={travelMode}
+            aria-label="Toggle Chair Yoga travel mode"
+            className={`travel-toggle ${travelMode ? 'travel-toggle-active' : ''}`}
+            onClick={onToggleTravelMode}
+            title={travelMode ? 'Switch to regular practice' : 'Switch to Chair Yoga (Travel mode)'}
+          >
+            <span className="travel-toggle-icon">🪑</span>
+            <span className="travel-toggle-label">Chair Yoga</span>
+            <span className={`travel-toggle-badge ${travelMode ? 'badge-on' : 'badge-off'}`}>
+              {travelMode ? 'ON' : 'OFF'}
+            </span>
+          </button>
+          {!travelMode && (
+            <label className="day-select">
+              <span className="day-select-label">Practice day</span>
+              <select
+                value={day}
+                onChange={(event) => onSelectDay(event.target.value as DayId)}
+                aria-label="Practice day"
+              >
+                {DAY_IDS.map((d) => (
+                  <option key={d} value={d}>
+                    {DAY_LABELS[d]}
+                    {d === today ? ' (today)' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-          <span className="week-badge">PERSONAL PRACTICE</span>
+          <span className="week-badge">{travelMode ? 'TRAVEL MODE' : 'PERSONAL PRACTICE'}</span>
         </div>
       </header>
       <div className="home-heading">
         <BlocksIcon count={blockCount} />
         <h1 className="home-title">
-          {DAY_LABELS[day]}
-          <span className="home-track">{trackLabel(track)}</span>
+          {travelMode ? 'Chair Yoga' : DAY_LABELS[day]}
+          <span className="home-track">
+            {travelMode ? 'Travel & Quick Practice · 20 min' : trackLabel(track)}
+          </span>
         </h1>
       </div>
       <section className="guided-hero">
@@ -136,11 +159,13 @@ export function Home({
           Manual practice
         </button>
         <button type="button" className="btn btn-ghost" onClick={onOpenToday}>
-          Today's activities
+          {travelMode ? 'Chair Yoga activities' : "Today's activities"}
         </button>
-        <button type="button" className="btn btn-ghost" onClick={onOpenWeek}>
-          Week
-        </button>
+        {!travelMode && (
+          <button type="button" className="btn btn-ghost" onClick={onOpenWeek}>
+            Week
+          </button>
+        )}
       </div>
 
       {(coreDiffs.length > 0 || breathDiffs.length > 0) && (
@@ -175,7 +200,7 @@ export function Home({
         </div>
       )}
 
-      <p className="equip">Mat · wall · towel</p>
+      <p className="equip">{travelMode ? 'Chair · comfortable clothes' : 'Mat · wall · towel'}</p>
     </section>
   )
 }

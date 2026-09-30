@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DAY_IDS, planForDay } from '../lib/schedule'
+import { DAY_IDS, chairYogaPlan, planForDay } from '../lib/schedule'
 import { hasCuratedActivityBenefit } from './activityBenefits'
 
 describe('activity benefits', () => {
@@ -10,4 +10,13 @@ describe('activity benefits', () => {
       .filter((name) => !hasCuratedActivityBenefit(name))
     expect(missing).toEqual([])
   })
+
+  it('has curated target data for every chair yoga activity', () => {
+    const missing = chairYogaPlan()
+      .map((step) => step.name)
+      .filter((name, index, names) => names.indexOf(name) === index)
+      .filter((name) => !hasCuratedActivityBenefit(name))
+    expect(missing).toEqual([])
+  })
 })
+

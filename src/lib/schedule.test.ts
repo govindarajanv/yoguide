@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  blocksForChairYoga,
   blocksForDay,
+  chairYogaPlan,
   diffVsYesterday,
   planForDay,
   previousDay,
@@ -92,3 +94,33 @@ describe('blocksForDay', () => {
     }
   })
 })
+
+describe('chairYogaPlan', () => {
+  it('builds exactly 31 steps totaling 1200 seconds (20 minutes)', () => {
+    const plan = chairYogaPlan()
+    expect(plan).toHaveLength(31)
+    expect(totalDurationSec(plan)).toBe(1200)
+  })
+
+  it('includes Surya Namaskar with 240s duration and 30s ding interval', () => {
+    const plan = chairYogaPlan()
+    const sn = plan.find((s) => s.id === 'chair-surya-namaskar')
+    expect(sn).toBeDefined()
+    expect(sn?.durationSec).toBe(240)
+    expect(sn?.dingIntervalSec).toBe(30)
+    expect(sn?.finalWarningSec).toBe(30)
+  })
+
+  it('splits into 2 blocks at chair-savasana', () => {
+    const blocks = blocksForChairYoga()
+    expect(blocks).toHaveLength(2)
+    expect(blocks[0]?.label).toBe('Block 1')
+    expect(blocks[0]?.name).toBe('Practice')
+    expect(blocks[0]?.steps.at(-1)?.id).toBe('chair-savasana')
+    expect(blocks[1]?.label).toBe('Block 2')
+    expect(blocks[1]?.name).toBe('Wind-down')
+    expect(blocks[1]?.steps[0]?.id).toBe('chair-hand-stretching')
+    expect(totalDurationSec(blocks[0]!.steps) + totalDurationSec(blocks[1]!.steps)).toBe(1200)
+  })
+})
+

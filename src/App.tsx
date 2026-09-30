@@ -9,6 +9,7 @@ import { Today } from './components/Today'
 import { Week } from './components/Week'
 import { VoiceSettings } from './components/VoiceSettings'
 import { APP_CONFIG } from './config/appConfig'
+import { CHAIR_YOGA_CONFIG } from './config/chairYogaConfig'
 import { useGuidedSession } from './hooks/useGuidedSession'
 import { useTheme } from './hooks/useTheme'
 import type { DayId } from './lib/types'
@@ -25,6 +26,7 @@ import {
   type DayProgress,
 } from './lib/progress'
 import {
+  chairYogaPlan,
   diffVsYesterday,
   jsDayToDayId,
   localDateKey,
@@ -41,64 +43,85 @@ export default function App() {
   const [view, setView] = useState<View>('home')
   const [selectedDay, setSelectedDay] = useState(today)
   const [previewDay, setPreviewDay] = useState(today)
-  const [progress, setProgress] = useState<DayProgress>(() => loadProgress(dateKey))
-  const [rounds, setRounds] = useState(() => loadRounds(dateKey, 'surya-namaskar'))
-  const [complete, setComplete] = useState(() => isSessionComplete(dateKey))
+  const [travelMode, setTravelMode] = useState<boolean>(false)
 
-  const practiceSteps = useMemo(() => planForDay(selectedDay), [selectedDay])
-  const diffs = useMemo(() => diffVsYesterday(selectedDay), [selectedDay])
+  const activeDateKey = useMemo(
+    () => (travelMode ? `${dateKey}:chair` : dateKey),
+    [travelMode, dateKey],
+  )
+  const roundsKey = travelMode ? 'chair-surya-namaskar' : 'surya-namaskar'
+
+  const [progress, setProgress] = useState<DayProgress>(() => loadProgress(activeDateKey))
+  const [rounds, setRounds] = useState(() => loadRounds(activeDateKey, roundsKey))
+  const [complete, setComplete] = useState(() => isSessionComplete(activeDateKey))
+
+  const chairSteps = useMemo(() => chairYogaPlan(), [])
+  const regularSteps = useMemo(() => planForDay(selectedDay), [selectedDay])
+  const practiceSteps = travelMode ? chairSteps : regularSteps
+  const diffs = useMemo(
+    () => (travelMode ? [] : diffVsYesterday(selectedDay)),
+    [travelMode, selectedDay],
+  )
+  const activeConfig = travelMode ? CHAIR_YOGA_CONFIG : APP_CONFIG
+
+  useEffect(() => {
+    setProgress(loadProgress(activeDateKey))
+    setRounds(loadRounds(activeDateKey, roundsKey))
+    setComplete(isSessionComplete(activeDateKey))
+  }, [activeDateKey, roundsKey])
 
   const onGuidedStepComplete = useCallback(
     (stepId: string) => {
-      setProgress(completeStep(dateKey, stepId))
+      setProgress(completeStep(activeDateKey, stepId))
     },
-    [dateKey],
+    [activeDateKey],
   )
 
   const guided = useGuidedSession({
     steps: practiceSteps,
-    dateKey,
+    dateKey: activeDateKey,
+    config: activeConfig,
     onStepComplete: onGuidedStepComplete,
   })
   const { theme, toggleTheme } = useTheme()
   const categorySummaries = useMemo(
     () =>
-      buildCategorySummaries(practiceSteps, guided.state.activeElapsedByStep, APP_CONFIG),
-    [guided.state.activeElapsedByStep, practiceSteps],
+      buildCategorySummaries(practiceSteps, guided.state.activeElapsedByStep, activeConfig),
+    [activeConfig, guided.state.activeElapsedByStep, practiceSteps],
   )
 
   const onToggle = useCallback(
     (stepId: string) => {
-      setProgress(toggleStep(dateKey, stepId))
+      setProgress(toggleStep(activeDateKey, stepId))
     },
-    [dateKey],
+    [activeDateKey],
   )
 
   const handleRounds = useCallback(
     (next: number) => {
-      saveRounds(dateKey, 'surya-namaskar', next)
+      saveRounds(activeDateKey, roundsKey, next)
       setRounds(next)
       if (next >= 7) {
-        const current = loadProgress(dateKey)
-        if (!current['surya-namaskar']) {
-          setProgress(toggleStep(dateKey, 'surya-namaskar'))
+        const current = loadProgress(activeDateKey)
+        if (!current[roundsKey]) {
+          setProgress(toggleStep(activeDateKey, roundsKey))
         }
       }
     },
-    [dateKey],
+    [activeDateKey, roundsKey],
   )
 
   const onMarkDone = useCallback(() => {
-    markSessionComplete(dateKey)
+    markSessionComplete(activeDateKey)
     setComplete(true)
-  }, [dateKey])
+  }, [activeDateKey])
 
   useEffect(() => {
     if (guided.state.status === 'completed') {
-      markSessionComplete(dateKey)
+      markSessionComplete(activeDateKey)
       setComplete(true)
     }
-  }, [dateKey, guided.state.status])
+  }, [activeDateKey, guided.state.status])
 
   const startGuided = useCallback(() => {
     setView('practice')
@@ -107,9 +130,9 @@ export default function App() {
 
   const resetGuided = useCallback(() => {
     guided.reset()
-    saveProgress(dateKey, {})
+    saveProgress(activeDateKey, {})
     setProgress({})
-  }, [dateKey, guided])
+  }, [activeDateKey, guided])
 
   const handleSelectDay = useCallback(
     (day: DayId) => {
@@ -118,6 +141,11 @@ export default function App() {
     },
     [guided],
   )
+
+  const handleToggleTravelMode = useCallback(() => {
+    setTravelMode((prev) => !prev)
+    guided.reset()
+  }, [guided])
 
   let content
   if (view === 'practice') {
@@ -136,6 +164,7 @@ export default function App() {
           steps={practiceSteps}
           progress={progress}
           rounds={rounds}
+          travelMode={travelMode}
           onToggle={onToggle}
           onRounds={handleRounds}
           onBack={() => setView('home')}
@@ -170,6 +199,7 @@ export default function App() {
         day={selectedDay}
         today={today}
         progress={progress}
+        travelMode={travelMode}
         onBack={() => setView('home')}
         onOpenPractice={() => setView('practice')}
         theme={theme}
@@ -211,6 +241,8 @@ export default function App() {
         guidedStatus={guided.state.status}
         guidedElapsedMs={guided.state.totalActiveMs}
         guidedCalories={guided.calories}
+        travelMode={travelMode}
+        onToggleTravelMode={handleToggleTravelMode}
         onStartGuided={startGuided}
         onOpenGuided={() => setView('practice')}
         onResumeGuided={() => {

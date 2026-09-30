@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { APP_CONFIG } from '../config/appConfig'
+import { APP_CONFIG, type AppConfig } from '../config/appConfig'
 import { calculateSessionCalories } from '../lib/calories'
 import { playDing, unlockDing } from '../lib/ding'
 import {
@@ -30,6 +30,7 @@ import { useScreenWakeLock } from './useScreenWakeLock'
 type Options = {
   steps: PracticeStep[]
   dateKey: string
+  config?: AppConfig
   onStepComplete: (stepId: string) => void
 }
 
@@ -53,7 +54,13 @@ export type GuidedSession = {
   reset: () => void
 }
 
-export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): GuidedSession {
+export function useGuidedSession({
+  steps,
+  dateKey,
+  config = APP_CONFIG,
+  onStepComplete,
+}: Options): GuidedSession {
+  const currentConfig = config ?? APP_CONFIG
   const speech = useMemo(() => createSpeechController(), [])
   const [voices, setVoices] = useState<SpeechVoice[]>(() => speech.getVoices())
   const [voicePreferences, setVoicePreferences] = useState(loadVoicePreferences)
@@ -65,13 +72,29 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
   )
   const announcedIndex = useRef<number | null>(null)
   const completionAnnounced = useRef(false)
+  const lastDateKey = useRef(dateKey)
+
+  useEffect(() => {
+    if (lastDateKey.current !== dateKey) {
+      lastDateKey.current = dateKey
+      announcedIndex.current = null
+      completionAnnounced.current = false
+      const snapshot = loadGuidedSnapshot(dateKey, steps)
+      if (snapshot) {
+        dispatch({ type: 'RESTORE', state: snapshot })
+      } else {
+        dispatch({ type: 'RESET', steps })
+      }
+    }
+  }, [dateKey, steps])
+
   const dingGains = useMemo(
     () => Array.from(new Set(steps.map((step) => step.dingGain ?? 1))),
     [steps],
   )
 
   const currentStep = steps[state.activityIndex] ?? null
-  const calories = calculateSessionCalories(steps, state.activeElapsedByStep, APP_CONFIG)
+  const calories = calculateSessionCalories(steps, state.activeElapsedByStep, currentConfig)
   const sessionActive = state.status === 'running' || state.status === 'announcing'
 
   useScreenWakeLock(sessionActive)
@@ -99,8 +122,8 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   const pause = useCallback(() => {
     speech.cancel()
-    dispatch({ type: 'PAUSE', nowMs: Date.now(), steps, config: APP_CONFIG })
-  }, [speech, steps])
+    dispatch({ type: 'PAUSE', nowMs: Date.now(), steps, config: currentConfig })
+  }, [currentConfig, speech, steps])
 
   const resume = useCallback(() => {
     if (!currentStep) return
@@ -112,8 +135,8 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   const requestStop = useCallback(() => {
     speech.cancel()
-    dispatch({ type: 'REQUEST_STOP', nowMs: Date.now(), steps, config: APP_CONFIG })
-  }, [speech, steps])
+    dispatch({ type: 'REQUEST_STOP', nowMs: Date.now(), steps, config: currentConfig })
+  }, [currentConfig, speech, steps])
 
   const cancelStop = useCallback(() => {
     dispatch({ type: 'CANCEL_STOP', nowMs: Date.now() })
@@ -133,7 +156,7 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
 
   useEffect(() => {
     if (state.status !== 'running') return
-    const tick = () => dispatch({ type: 'TICK', nowMs: Date.now(), steps, config: APP_CONFIG })
+    const tick = () => dispatch({ type: 'TICK', nowMs: Date.now(), steps, config: currentConfig })
     const timer = window.setInterval(tick, 250)
     const onVisibility = () => {
       if (document.visibilityState === 'visible') tick()
@@ -143,7 +166,7 @@ export function useGuidedSession({ steps, dateKey, onStepComplete }: Options): G
       window.clearInterval(timer)
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [state.status, steps])
+  }, [currentConfig, state.status, steps])
 
   useEffect(() => {
     for (const stepId of state.justCompletedStepIds) onStepComplete(stepId)
