@@ -6,6 +6,7 @@ import { SessionController } from './components/SessionController'
 import { SessionSummary } from './components/SessionSummary'
 import { StopSessionDialog } from './components/StopSessionDialog'
 import { Today } from './components/Today'
+import { TopModeBar } from './components/TopModeBar'
 import { Week } from './components/Week'
 import { VoiceSettings } from './components/VoiceSettings'
 import { APP_CONFIG } from './config/appConfig'
@@ -268,7 +269,10 @@ export default function App() {
 
   return (
     <>
-      <main className={`app ${controllerVisible ? 'app-with-controller' : ''}`}>{content}</main>
+      <main className={`app ${controllerVisible ? 'app-with-controller' : ''}`}>
+        <TopModeBar travelMode={travelMode} onToggleTravelMode={handleToggleTravelMode} />
+        {content}
+      </main>
       {controllerVisible && guided.currentStep && (
         <ActivityBenefitCard step={guided.currentStep} />
       )}
