@@ -83,6 +83,7 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   Eagle: { primary: 'Shoulders & upper back', secondary: ['Hips', 'Joint mobility', 'Focus'] },
   Warrior: { primary: 'Hips & thighs', secondary: ['Chest', 'Shoulders', 'Core'] },
   'Toe Touches': { primary: 'Hamstrings', secondary: ['Lower back', 'Spine', 'Hips'] },
+  'Ardha Chandrasana': { primary: 'Side body & balance', secondary: ['Hips', 'Spine', 'Chest'] },
   Trikonasana: { primary: 'Hamstrings & side body', secondary: ['Hips', 'Spine', 'Chest'] },
   Tadasana: { primary: 'Posture & alignment', secondary: ['Spine', 'Breath', 'Core'] },
   'Hand Stretching': { primary: 'Hands & wrists', secondary: ['Fingers', 'Forearms'] },

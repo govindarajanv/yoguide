@@ -141,13 +141,13 @@ export const CHAIR_YOGA_STEPS: StepDef[] = [
     cue: 'Hinge forward from hips with flat back, reaching down toward toes',
   },
   {
-    id: 'chair-trikonasana',
+    id: 'chair-ardha-chandrasana',
     category: 'warmUp',
-    name: 'Trikonasana',
+    name: 'Ardha Chandrasana',
     sets: 2,
     reps: 1,
     durationSec: 60,
-    cue: 'Extend front leg, slide front hand down shin, reach other arm up; both sides',
+    cue: 'Side bend with arm arched overhead into half moon, lengthening ribs; switch sides',
   },
   {
     id: 'chair-side-lunge',
