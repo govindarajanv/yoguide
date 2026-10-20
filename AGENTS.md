@@ -8,9 +8,12 @@ Personal static SPA that helps follow a ~47-minute daily yoga/fitness schedule s
 
 **Locked product decisions:**
 
-- Practice companion: day list + diff vs yesterday + large practice mode + soft check-off + cues + Surya round helper
+- Practice companion: day list + muscle-coverage/benefits section + large practice mode + soft check-off + cues + Surya round helper
+- "Muscle groups covered today" lists body sections (e.g. Arms) each with the count of activities that train it: `Arms (9)`
 - Optional guided mode: voice cues, per-activity countdown, overall active timer, fixed controls, and MET calorie estimate
-- Voice and speed preferences are local; narration is title + time only
+- **Pick your session** starts guided mode from any section or single activity; round-based activities (Surya Namaskar) can start from a chosen round
+- Round-based activities ring a **single bell** per round then announce the round number (voice); non-round activities ring once at midpoint
+- Voice and speed preferences are local; narration is title + time only (+ round number for Surya)
 - Guided activities show curated general body targets; completed sessions show category charts
 - Manual practice remains available without a timer
 - Progress in `localStorage` only (no login)

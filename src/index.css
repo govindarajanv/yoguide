@@ -594,6 +594,11 @@ button:focus-visible {
   font-weight: 800;
 }
 
+.muscle-region-count {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .muscle-region-activities {
   display: flex;
   flex-wrap: wrap;

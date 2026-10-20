@@ -87,7 +87,7 @@ export function MuscleMap({ steps }: { steps: PracticeStep[] }) {
             <div key={entry.id} className="muscle-region-card">
               <h3 className="muscle-region-title">
                 <i className="muscle-legend-dot" aria-hidden="true" />
-                {entry.label}
+                {entry.label} <span className="muscle-region-count">({entry.activities.length})</span>
               </h3>
               <ul className="muscle-region-activities">
                 {entry.activities.map((name) => (

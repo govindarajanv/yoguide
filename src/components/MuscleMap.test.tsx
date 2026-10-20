@@ -21,8 +21,14 @@ describe('MuscleMap', () => {
   it('lists every muscle region with the activities that cover it', () => {
     render(<MuscleMap steps={[step('Planks'), step('Bird Dog')]} />)
     expect(screen.getByText('Core & abs')).toBeInTheDocument()
+    expect(screen.getAllByText('(2)').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Planks').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Bird Dog').length).toBeGreaterThan(0)
+  })
+
+  it('suffixes each region title with the activity count', () => {
+    render(<MuscleMap steps={[step('Planks'), step('Bird Dog'), step('Dead Bug')]} />)
+    expect(screen.getAllByText('(3)').length).toBeGreaterThan(0)
   })
 
   it('treats full body muscle targets as covering every region', () => {
@@ -30,6 +36,7 @@ describe('MuscleMap', () => {
     expect(screen.getByText('Head & neck')).toBeInTheDocument()
     expect(screen.getByText('Shoulders')).toBeInTheDocument()
     expect(screen.getByText('Chest & breath')).toBeInTheDocument()
+    expect(screen.getAllByText('(1)').length).toBeGreaterThan(10)
   })
 
   it('shows an empty message when no regions are highlighted', () => {
