@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Home } from './components/Home'
 import { ActivityBenefitCard } from './components/ActivityBenefitCard'
+import { Disclaimer } from './components/Disclaimer'
 import { Practice } from './components/Practice'
 import { SessionController } from './components/SessionController'
 import { SessionSummary } from './components/SessionSummary'
@@ -278,7 +279,10 @@ export default function App() {
 
   return (
     <>
-      <main className={`app ${controllerVisible ? 'app-with-controller' : ''}`}>{content}</main>
+      <main className={`app ${controllerVisible ? 'app-with-controller' : ''}`}>
+        {content}
+        <Disclaimer />
+      </main>
       {controllerVisible && guided.currentStep && (
         <ActivityBenefitCard step={guided.currentStep} />
       )}
