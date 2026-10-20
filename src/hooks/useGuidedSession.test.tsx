@@ -106,8 +106,8 @@ describe('useGuidedSession midpoint bell', () => {
   })
 })
 
-describe('useGuidedSession Surya Namaskar interval ding', () => {
-  it('rings every 30 seconds only during Surya Namaskar', async () => {
+describe('useGuidedSession Surya Namaskar interval rings', () => {
+  it('rings N times on the Nth 30-second interval during Surya Namaskar', async () => {
     const { result } = renderHook(() =>
       useGuidedSession({
         steps: [suryaNamaskar],
@@ -134,12 +134,18 @@ describe('useGuidedSession Surya Namaskar interval ding', () => {
     await act(async () => {
       vi.advanceTimersByTime(30_000)
     })
-    expect(mockPlayDing).toHaveBeenCalledTimes(2)
+    await act(async () => {
+      vi.advanceTimersByTime(500)
+    })
+    expect(mockPlayDing).toHaveBeenCalledTimes(3)
 
     await act(async () => {
       vi.advanceTimersByTime(30_000)
     })
-    expect(mockPlayDing).toHaveBeenCalledTimes(3)
+    await act(async () => {
+      vi.advanceTimersByTime(1_000)
+    })
+    expect(mockPlayDing).toHaveBeenCalledTimes(6)
     expect(result.current.state.nextDingRemainingMs).toBeNull()
   })
 })

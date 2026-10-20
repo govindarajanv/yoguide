@@ -72,7 +72,7 @@ export function Today({
         <BlocksIcon count={blocks.length} />
         <div>
           <span className="eyebrow">
-            {travelMode ? 'Travel mode · Chair Yoga' : trackLabel(trackForDay(day))}
+            {travelMode ? 'Chair mode · Chair Yoga' : trackLabel(trackForDay(day))}
           </span>
           <h1 className="today-title">{travelMode ? 'Chair Yoga' : DAY_LABELS[day]}</h1>
         </div>
@@ -80,7 +80,7 @@ export function Today({
 
       <p className="week-note">
         {travelMode
-          ? 'Travel routine — two practice blocks (Practice & Wind-down).'
+          ? 'Chair routine — two practice blocks (Practice & Wind-down).'
           : blocks.length === 2
             ? 'Sun / Tue / Thu / Sat routine — two practice blocks.'
             : 'Mon / Wed / Fri routine — one practice block.'}

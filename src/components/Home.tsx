@@ -1,12 +1,14 @@
-import type { DayDiff, DayId } from '../lib/types'
+import { useState } from 'react'
+import type { DayId, PracticeStep } from '../lib/types'
 import type { GuidedStatus } from '../hooks/guidedSessionReducer'
 import type { Theme } from '../hooks/useTheme'
+import type { DayBenefits } from '../lib/dayBenefits'
 import { formatClock } from '../lib/time'
 import version from '../../VERSION?raw'
 import { ThemeToggle } from './ThemeToggle'
 import { BlocksIcon } from './BlocksIcon'
+import { PickSessionDialog } from './PickSessionDialog'
 import {
-  CATEGORY_LABELS,
   DAY_IDS,
   DAY_LABELS,
   blocksForDay,
@@ -20,15 +22,17 @@ type Props = {
   today: DayId
   onSelectDay: (day: DayId) => void
   totalSec: number
-  diffs: DayDiff[]
+  dayBenefits: DayBenefits
   checked: number
   totalSteps: number
+  practiceSteps: PracticeStep[]
   guidedStatus: GuidedStatus
   guidedElapsedMs: number
   guidedCalories: number
   travelMode: boolean
   onToggleTravelMode: () => void
   onStartGuided: () => void
+  onStartFrom: (index: number) => void
   onOpenGuided: () => void
   onResumeGuided: () => void
   onStart: () => void
@@ -43,15 +47,17 @@ export function Home({
   today,
   onSelectDay,
   totalSec,
-  diffs,
+  dayBenefits,
   checked,
   totalSteps,
+  practiceSteps,
   guidedStatus,
   guidedElapsedMs,
   guidedCalories,
   travelMode,
   onToggleTravelMode,
   onStartGuided,
+  onStartFrom,
   onOpenGuided,
   onResumeGuided,
   onStart,
@@ -62,11 +68,11 @@ export function Home({
 }: Props) {
   const track = trackForDay(day)
   const blockCount = travelMode ? 2 : blocksForDay(day).length
-  const coreDiffs = travelMode ? [] : diffs.filter((d) => d.category === 'core')
-  const breathDiffs = travelMode ? [] : diffs.filter((d) => d.category === 'pranayama')
   const guidedRunning = ['announcing', 'running', 'stop-confirmation'].includes(guidedStatus)
   const guidedResumable = guidedStatus === 'paused' || guidedStatus === 'saved'
   const guidedComplete = guidedStatus === 'completed'
+  const [pickOpen, setPickOpen] = useState(false)
+  const canPick = guidedStatus === 'idle' || guidedStatus === 'completed'
 
   return (
     <section className="home">
@@ -80,13 +86,13 @@ export function Home({
             type="button"
             role="switch"
             aria-checked={travelMode}
-            aria-label="Toggle travel mode"
+            aria-label="Toggle chair mode"
             className={`travel-toggle ${travelMode ? 'travel-toggle-active' : ''}`}
             onClick={onToggleTravelMode}
-            title={travelMode ? 'Turn travel mode off' : 'Turn travel mode on (Chair Yoga)'}
+            title={travelMode ? 'Turn chair mode off' : 'Turn chair mode on (Chair Yoga)'}
           >
-            <span className="travel-toggle-icon">✈️</span>
-            <span className="travel-toggle-label">Travel mode</span>
+            <span className="travel-toggle-icon">🧘</span>
+            <span className="travel-toggle-label">Chair mode</span>
             <span className={`travel-toggle-badge ${travelMode ? 'badge-on' : 'badge-off'}`}>
               {travelMode ? 'ON' : 'OFF'}
             </span>
@@ -109,7 +115,7 @@ export function Home({
             </label>
           )}
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-          <span className="week-badge">{travelMode ? 'TRAVEL MODE' : 'PERSONAL PRACTICE'}</span>
+          <span className="week-badge">{travelMode ? 'CHAIR MODE' : 'PERSONAL PRACTICE'}</span>
         </div>
       </header>
       <div className="home-heading">
@@ -117,7 +123,7 @@ export function Home({
         <h1 className="home-title">
           {travelMode ? 'Chair Yoga' : DAY_LABELS[day]}
           <span className="home-track">
-            {travelMode ? 'Travel & Quick Practice · 20 min' : trackLabel(track)}
+            {travelMode ? 'Chair Yoga · 20 min' : trackLabel(track)}
           </span>
         </h1>
       </div>
@@ -133,24 +139,44 @@ export function Home({
           <div><span>Estimated burn</span><strong>{guidedCalories.toFixed(1)} kcal</strong></div>
         </div>
 
-        <button
-          type="button"
-          className="btn btn-primary hero-play"
-          onClick={
-            guidedRunning ? onOpenGuided : guidedResumable ? onResumeGuided : onStartGuided
-          }
-          disabled={guidedComplete}
-        >
-          <span className="play-icon">▶</span>
-          {guidedRunning
-            ? 'Return to session'
-            : guidedResumable
-              ? 'Resume guided session'
-              : guidedComplete
-                ? 'Completed'
-                : 'Start guided session'}
-        </button>
+        <div className="hero-actions">
+          <button
+            type="button"
+            className="btn btn-primary hero-play"
+            onClick={
+              guidedRunning ? onOpenGuided : guidedResumable ? onResumeGuided : onStartGuided
+            }
+            disabled={guidedComplete}
+          >
+            <span className="play-icon">▶</span>
+            {guidedRunning
+              ? 'Return to session'
+              : guidedResumable
+                ? 'Resume guided session'
+                : guidedComplete
+                  ? 'Completed'
+                  : 'Start guided session'}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost hero-pick"
+            onClick={() => setPickOpen(true)}
+            disabled={!canPick || practiceSteps.length === 0}
+          >
+            Pick your session
+          </button>
+        </div>
       </section>
+
+      <PickSessionDialog
+        open={pickOpen}
+        steps={practiceSteps}
+        onPick={(index) => {
+          setPickOpen(false)
+          onStartFrom(index)
+        }}
+        onClose={() => setPickOpen(false)}
+      />
 
       <p className="home-meta">{checked}/{totalSteps} activities complete</p>
 
@@ -168,37 +194,27 @@ export function Home({
         )}
       </div>
 
-      {(coreDiffs.length > 0 || breathDiffs.length > 0) && (
-        <div className="diff-block">
-          <h2>Different vs yesterday</h2>
-          {coreDiffs.length > 0 && (
-            <div className="diff-group">
-              <h3>{CATEGORY_LABELS.core}</h3>
-              <ul>
-                {coreDiffs.map((d) => (
-                  <li key={d.stepId}>
-                    <strong>{d.todayName}</strong>
-                    <span className="diff-was">was {d.yesterdayName}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {breathDiffs.length > 0 && (
-            <div className="diff-group">
-              <h3>{CATEGORY_LABELS.pranayama}</h3>
-              <ul>
-                {breathDiffs.map((d) => (
-                  <li key={d.stepId}>
-                    <strong>{d.todayName}</strong>
-                    <span className="diff-was">was {d.yesterdayName}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+      <section className="benefits-block">
+        <h2>Muscle groups covered today</h2>
+        <div className="benefits-muscles">
+          {dayBenefits.muscles.map((muscle) => (
+            <span key={muscle} className="benefits-muscle">
+              {muscle}
+            </span>
+          ))}
         </div>
-      )}
+
+        <h2 className="benefits-title-2">Benefits if you complete today's practice</h2>
+        <p className="benefits-metabolic">
+          Estimated metabolic burn <strong>{dayBenefits.calories.toFixed(0)} kcal</strong> over{' '}
+          {formatDuration(totalSec).replace('~', '')}.
+        </p>
+        <ul className="benefits-list">
+          {dayBenefits.physiology.map((benefit) => (
+            <li key={benefit}>{benefit}</li>
+          ))}
+        </ul>
+      </section>
 
       <p className="equip">{travelMode ? 'Chair · comfortable clothes' : 'Mat · wall · towel'}</p>
     </section>

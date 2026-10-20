@@ -12,6 +12,7 @@ import { APP_CONFIG } from './config/appConfig'
 import { CHAIR_YOGA_CONFIG } from './config/chairYogaConfig'
 import { useGuidedSession } from './hooks/useGuidedSession'
 import { useTheme } from './hooks/useTheme'
+import { buildDayBenefits } from './lib/dayBenefits'
 import type { DayId } from './lib/types'
 import {
   checkedCount,
@@ -27,7 +28,6 @@ import {
 } from './lib/progress'
 import {
   chairYogaPlan,
-  diffVsYesterday,
   jsDayToDayId,
   localDateKey,
   planForDay,
@@ -58,10 +58,6 @@ export default function App() {
   const chairSteps = useMemo(() => chairYogaPlan(), [])
   const regularSteps = useMemo(() => planForDay(selectedDay), [selectedDay])
   const practiceSteps = travelMode ? chairSteps : regularSteps
-  const diffs = useMemo(
-    () => (travelMode ? [] : diffVsYesterday(selectedDay)),
-    [travelMode, selectedDay],
-  )
   const activeConfig = travelMode ? CHAIR_YOGA_CONFIG : APP_CONFIG
 
   useEffect(() => {
@@ -84,6 +80,10 @@ export default function App() {
     onStepComplete: onGuidedStepComplete,
   })
   const { theme, toggleTheme } = useTheme()
+  const dayBenefits = useMemo(
+    () => buildDayBenefits(practiceSteps, activeConfig),
+    [activeConfig, practiceSteps],
+  )
   const categorySummaries = useMemo(
     () =>
       buildCategorySummaries(practiceSteps, guided.state.activeElapsedByStep, activeConfig),
@@ -127,6 +127,14 @@ export default function App() {
     setView('practice')
     guided.start()
   }, [guided])
+
+  const startFromGuided = useCallback(
+    (index: number) => {
+      setView('practice')
+      guided.startFrom(index)
+    },
+    [guided],
+  )
 
   const resetGuided = useCallback(() => {
     guided.reset()
@@ -232,18 +240,20 @@ export default function App() {
         today={today}
         onSelectDay={handleSelectDay}
         totalSec={totalDurationSec(practiceSteps)}
-        diffs={diffs}
+        dayBenefits={dayBenefits}
         checked={checkedCount(
           progress,
           practiceSteps.map((s) => s.id),
         )}
         totalSteps={practiceSteps.length}
+        practiceSteps={practiceSteps}
         guidedStatus={guided.state.status}
         guidedElapsedMs={guided.state.totalActiveMs}
         guidedCalories={guided.calories}
         travelMode={travelMode}
         onToggleTravelMode={handleToggleTravelMode}
         onStartGuided={startGuided}
+        onStartFrom={startFromGuided}
         onOpenGuided={() => setView('practice')}
         onResumeGuided={() => {
           setView('practice')

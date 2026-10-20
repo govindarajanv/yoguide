@@ -46,6 +46,7 @@ export type GuidedSession = {
   testVoice: () => void
   hasSavedSession: boolean
   start: () => void
+  startFrom: (index: number) => void
   pause: () => void
   resume: () => void
   requestStop: () => void
@@ -119,6 +120,19 @@ export function useGuidedSession({
     dispatch({ type: 'START' })
     void announceAndRun(first)
   }, [announceAndRun, dingGains, state.activityIndex, steps])
+
+  const startFrom = useCallback(
+    (index: number) => {
+      const step = steps[index]
+      if (!step) return
+      unlockDing(dingGains)
+      completionAnnounced.current = false
+      announcedIndex.current = index
+      dispatch({ type: 'START_FROM', index, steps })
+      void announceAndRun(step)
+    },
+    [announceAndRun, dingGains, steps],
+  )
 
   const pause = useCallback(() => {
     speech.cancel()
@@ -203,9 +217,17 @@ export function useGuidedSession({
 
   useEffect(() => {
     if (!state.pendingBell || state.status !== 'running') return
+    const rings = Math.max(1, state.bellRings)
+    const gain = currentStep?.dingGain ?? 1
     dispatch({ type: 'ACK_BELL' })
-    playDing(currentStep?.dingGain ?? 1)
-  }, [currentStep, state.pendingBell, state.status])
+    for (let i = 0; i < rings; i++) {
+      if (i === 0) {
+        void playDing(gain)
+      } else {
+        window.setTimeout(() => void playDing(gain), i * 400)
+      }
+    }
+  }, [currentStep, state.bellRings, state.pendingBell, state.status])
 
   useEffect(() => {
     if (state.status !== 'completed' || completionAnnounced.current) return
@@ -254,6 +276,7 @@ export function useGuidedSession({
     hasSavedSession:
       (state.status === 'saved' || state.status === 'paused') && state.totalActiveMs > 0,
     start,
+    startFrom,
     pause,
     resume,
     requestStop,

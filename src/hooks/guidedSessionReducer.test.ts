@@ -52,6 +52,27 @@ describe('guidedSessionReducer', () => {
     expect(running.runningSinceMs).toBe(1_000)
   })
 
+  it('starts from a chosen activity index, skipping everything before it', () => {
+    const initial = createInitialGuidedState(steps)
+    const from = guidedSessionReducer(initial, {
+      type: 'START_FROM',
+      index: 1,
+      steps,
+    })
+    expect(from.status).toBe('announcing')
+    expect(from.activityIndex).toBe(1)
+    expect(from.activityRemainingMs).toBe(60_000)
+    expect(from.totalActiveMs).toBe(0)
+    expect(from.activeElapsedByStep).toEqual({})
+    expect(from.nextDingRemainingMs).toBe(30_000)
+
+    const running = guidedSessionReducer(from, {
+      type: 'ANNOUNCEMENT_FINISHED',
+      nowMs: 1_000,
+    })
+    expect(running.status).toBe('running')
+  })
+
   it('freezes the next activity while its announcement plays', () => {
     const running = {
       ...createInitialGuidedState(steps),
@@ -163,16 +184,19 @@ describe('guidedSessionReducer', () => {
 
     const at30 = reconcileAt(state, 30_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at30.state.pendingBell).toBe(true)
+    expect(at30.state.bellRings).toBe(1)
     expect(at30.state.nextDingRemainingMs).toBe(60_000)
 
     state = { ...at30.state, pendingBell: false }
     const at60 = reconcileAt(state, 60_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at60.state.pendingBell).toBe(true)
+    expect(at60.state.bellRings).toBe(2)
     expect(at60.state.nextDingRemainingMs).toBe(30_000)
 
     state = { ...at60.state, pendingBell: false }
     const at90 = reconcileAt(state, 90_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at90.state.pendingBell).toBe(true)
+    expect(at90.state.bellRings).toBe(3)
     expect(at90.state.nextDingRemainingMs).toBeNull()
 
     state = { ...at90.state, pendingBell: false }

@@ -29,12 +29,15 @@ export type GuidedSessionState = {
   /** Next activity-remaining-ms threshold that triggers a ding; null = none */
   nextDingRemainingMs: number | null
   pendingBell: boolean
+  /** How many successive rings to play for this bell (1 = midpoint/announcement ding, N = Nth interval) */
+  bellRings: number
   justCompletedStepIds: string[]
   resumeAfterStop: 'running' | 'paused' | null
 }
 
 export type GuidedSessionAction =
   | { type: 'START' }
+  | { type: 'START_FROM'; index: number; steps: PracticeStep[] }
   | { type: 'BEGIN_ANNOUNCEMENT' }
   | { type: 'ANNOUNCEMENT_FINISHED'; nowMs: number }
   | { type: 'TICK'; nowMs: number; steps: PracticeStep[]; config: AppConfig }
@@ -67,6 +70,7 @@ export function createInitialGuidedState(steps: PracticeStep[]): GuidedSessionSt
     dingIntervalMs: ding.dingIntervalMs,
     nextDingRemainingMs: ding.nextDingRemainingMs,
     pendingBell: false,
+    bellRings: 0,
     justCompletedStepIds: [],
     resumeAfterStop: null,
   }
@@ -113,6 +117,7 @@ export function reconcileAt(
   let dingIntervalMs = state.dingIntervalMs
   let nextDingRemainingMs = state.nextDingRemainingMs
   let pendingBell = state.pendingBell
+  let bellRings = state.bellRings
   let consumedMs = 0
   const completedStepIds: string[] = []
   const activeElapsedByStep = { ...state.activeElapsedByStep }
@@ -127,6 +132,7 @@ export function reconcileAt(
     warningEmitted = false
     pendingWarning = null
     pendingBell = false
+    bellRings = 0
 
     const next = steps[activityIndex]
     if (!next) {
@@ -145,6 +151,7 @@ export function reconcileAt(
           dingIntervalMs: 0,
           nextDingRemainingMs: null,
           pendingBell: false,
+          bellRings: 0,
           justCompletedStepIds: completedStepIds,
           resumeAfterStop: null,
         },
@@ -180,9 +187,11 @@ export function reconcileAt(
       pendingBell = true
       bellJustTriggered = true
       if (dingIntervalMs > 0) {
+        bellRings += 1
         const nextThreshold: number = nextDingRemainingMs - dingIntervalMs
         nextDingRemainingMs = nextThreshold > 0 ? nextThreshold : null
       } else {
+        bellRings = 1
         nextDingRemainingMs = null
       }
     }
@@ -206,6 +215,7 @@ export function reconcileAt(
       dingIntervalMs,
       nextDingRemainingMs,
       pendingBell,
+      bellRings,
       justCompletedStepIds: completedStepIds,
     },
   }
@@ -218,6 +228,18 @@ export function guidedSessionReducer(
   switch (action.type) {
     case 'START':
       return { ...state, status: 'announcing', justCompletedStepIds: [] }
+    case 'START_FROM': {
+      const step = action.steps[action.index]
+      const ding = initDingForStep(step)
+      return {
+        ...createInitialGuidedState(action.steps),
+        status: 'announcing',
+        activityIndex: action.index,
+        activityRemainingMs: (step?.durationSec ?? 0) * 1000,
+        dingIntervalMs: ding.dingIntervalMs,
+        nextDingRemainingMs: ding.nextDingRemainingMs,
+      }
+    }
     case 'BEGIN_ANNOUNCEMENT':
       return { ...state, status: 'announcing', runningSinceMs: null }
     case 'ANNOUNCEMENT_FINISHED':
@@ -264,6 +286,6 @@ export function guidedSessionReducer(
     case 'RESET':
       return createInitialGuidedState(action.steps)
     case 'RESTORE':
-      return action.state
+      return { ...action.state, bellRings: action.state.bellRings ?? 0 }
   }
 }
