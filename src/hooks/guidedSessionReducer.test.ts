@@ -73,6 +73,34 @@ describe('guidedSessionReducer', () => {
     expect(running.status).toBe('running')
   })
 
+  it('starts a round-based activity from a chosen round', () => {
+    const suryaSteps: PracticeStep[] = [
+      {
+        id: 'surya-namaskar',
+        category: 'asanas',
+        name: 'Surya Namaskar',
+        sets: 1,
+        reps: 1,
+        durationSec: 100,
+        cue: 'Flow.',
+        dingIntervalSec: 30,
+      },
+      ...steps.slice(1),
+    ]
+    const initial = createInitialGuidedState(steps)
+    const from = guidedSessionReducer(initial, {
+      type: 'START_FROM',
+      index: 0,
+      round: 3,
+      steps: suryaSteps,
+    })
+    expect(from.status).toBe('announcing')
+    expect(from.activityIndex).toBe(0)
+    expect(from.activityRemainingMs).toBe(100_000 - 2 * 30_000)
+    expect(from.nextDingRemainingMs).toBe(100_000 - 2 * 30_000 - 30_000)
+    expect(from.dingRound).toBe(3)
+  })
+
   it('freezes the next activity while its announcement plays', () => {
     const running = {
       ...createInitialGuidedState(steps),
@@ -160,7 +188,7 @@ describe('guidedSessionReducer', () => {
     expect(after.state.pendingBell).toBe(true)
   })
 
-  it('rings every 30 seconds for interval activities and only once otherwise', () => {
+  it('fires a single bell with the round number for interval activities', () => {
     const suryaSteps: PracticeStep[] = [
       {
         id: 'surya-namaskar',
@@ -181,25 +209,29 @@ describe('guidedSessionReducer', () => {
     }
     expect(state.dingIntervalMs).toBe(30_000)
     expect(state.nextDingRemainingMs).toBe(90_000)
+    expect(state.dingRound).toBe(1)
 
     const at30 = reconcileAt(state, 30_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at30.state.pendingBell).toBe(true)
-    expect(at30.state.bellRings).toBe(1)
+    expect(at30.state.bellRound).toBe(1)
+    expect(at30.state.dingRound).toBe(2)
     expect(at30.state.nextDingRemainingMs).toBe(60_000)
 
     state = { ...at30.state, pendingBell: false }
     const at60 = reconcileAt(state, 60_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at60.state.pendingBell).toBe(true)
-    expect(at60.state.bellRings).toBe(2)
+    expect(at60.state.bellRound).toBe(2)
+    expect(at60.state.dingRound).toBe(3)
     expect(at60.state.nextDingRemainingMs).toBe(30_000)
 
     state = { ...at60.state, pendingBell: false }
     const at90 = reconcileAt(state, 90_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at90.state.pendingBell).toBe(true)
-    expect(at90.state.bellRings).toBe(3)
+    expect(at90.state.bellRound).toBe(3)
+    expect(at90.state.dingRound).toBe(4)
     expect(at90.state.nextDingRemainingMs).toBeNull()
 
-    state = { ...at90.state, pendingBell: false }
+    state = { ...at90.state, pendingBell: false, bellRound: 0 }
     const at91 = reconcileAt(state, 91_000, suryaSteps, DEFAULT_APP_CONFIG)
     expect(at91.state.pendingBell).toBe(false)
     expect(at91.state.nextDingRemainingMs).toBeNull()

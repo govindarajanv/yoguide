@@ -1114,6 +1114,58 @@ button:focus-visible {
   border-bottom: 1px solid var(--line);
 }
 
+.pick-session-activity-row {
+  border-top: 1px solid var(--line);
+}
+
+.pick-session-activity-row .pick-session-activity {
+  border-top: 0;
+}
+
+.pick-session-activity-row:first-child .pick-session-activity {
+  border-top: 0;
+}
+
+.pick-session-rounds {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 1rem 0.7rem;
+}
+
+.pick-session-rounds-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pick-session-rounds-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.pick-session-round {
+  min-width: 34px;
+  min-height: 30px;
+  padding: 0.15rem 0.45rem;
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-3);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pick-session-round:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
 .session-summary {
   width: min(760px, 100%);
   margin: 0 auto 1rem;

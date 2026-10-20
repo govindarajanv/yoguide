@@ -130,9 +130,9 @@ export default function App() {
   }, [guided])
 
   const startFromGuided = useCallback(
-    (index: number) => {
+    (index: number, round?: number) => {
       setView('practice')
-      guided.startFrom(index)
+      guided.startFrom(index, round)
     },
     [guided],
   )

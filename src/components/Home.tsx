@@ -33,7 +33,7 @@ type Props = {
   travelMode: boolean
   onToggleTravelMode: () => void
   onStartGuided: () => void
-  onStartFrom: (index: number) => void
+  onStartFrom: (index: number, round?: number) => void
   onOpenGuided: () => void
   onResumeGuided: () => void
   onStart: () => void
@@ -172,9 +172,9 @@ export function Home({
       <PickSessionDialog
         open={pickOpen}
         steps={practiceSteps}
-        onPick={(index) => {
+        onPick={(index, round) => {
           setPickOpen(false)
-          onStartFrom(index)
+          onStartFrom(index, round)
         }}
         onClose={() => setPickOpen(false)}
       />

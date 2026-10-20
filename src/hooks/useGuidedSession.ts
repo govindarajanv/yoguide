@@ -46,7 +46,7 @@ export type GuidedSession = {
   testVoice: () => void
   hasSavedSession: boolean
   start: () => void
-  startFrom: (index: number) => void
+  startFrom: (index: number, round?: number) => void
   pause: () => void
   resume: () => void
   requestStop: () => void
@@ -122,13 +122,13 @@ export function useGuidedSession({
   }, [announceAndRun, dingGains, state.activityIndex, steps])
 
   const startFrom = useCallback(
-    (index: number) => {
+    (index: number, round?: number) => {
       const step = steps[index]
       if (!step) return
       unlockDing(dingGains)
       completionAnnounced.current = false
       announcedIndex.current = index
-      dispatch({ type: 'START_FROM', index, steps })
+      dispatch({ type: 'START_FROM', index, round: round ?? 1, steps })
       void announceAndRun(step)
     },
     [announceAndRun, dingGains, steps],
@@ -217,17 +217,14 @@ export function useGuidedSession({
 
   useEffect(() => {
     if (!state.pendingBell || state.status !== 'running') return
-    const rings = Math.max(1, state.bellRings)
     const gain = currentStep?.dingGain ?? 1
+    const round = state.bellRound
     dispatch({ type: 'ACK_BELL' })
-    for (let i = 0; i < rings; i++) {
-      if (i === 0) {
-        void playDing(gain)
-      } else {
-        window.setTimeout(() => void playDing(gain), i * 400)
-      }
+    void playDing(gain)
+    if (round > 0) {
+      void speech.speak(`Round ${round}`, voicePreferences)
     }
-  }, [currentStep, state.bellRings, state.pendingBell, state.status])
+  }, [currentStep, state.bellRound, state.pendingBell, state.status, speech, voicePreferences])
 
   useEffect(() => {
     if (state.status !== 'completed' || completionAnnounced.current) return

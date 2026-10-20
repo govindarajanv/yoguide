@@ -29,15 +29,17 @@ export type GuidedSessionState = {
   /** Next activity-remaining-ms threshold that triggers a ding; null = none */
   nextDingRemainingMs: number | null
   pendingBell: boolean
-  /** How many successive rings to play for this bell (1 = midpoint/announcement ding, N = Nth interval) */
-  bellRings: number
+  /** Running round counter for round-based interval steps (1-based), 0 when N/A */
+  dingRound: number
+  /** Round number to announce when the pending bell fires (0 = plain bell, no announcement) */
+  bellRound: number
   justCompletedStepIds: string[]
   resumeAfterStop: 'running' | 'paused' | null
 }
 
 export type GuidedSessionAction =
   | { type: 'START' }
-  | { type: 'START_FROM'; index: number; steps: PracticeStep[] }
+  | { type: 'START_FROM'; index: number; round?: number; steps: PracticeStep[] }
   | { type: 'BEGIN_ANNOUNCEMENT' }
   | { type: 'ANNOUNCEMENT_FINISHED'; nowMs: number }
   | { type: 'TICK'; nowMs: number; steps: PracticeStep[]; config: AppConfig }
@@ -70,7 +72,8 @@ export function createInitialGuidedState(steps: PracticeStep[]): GuidedSessionSt
     dingIntervalMs: ding.dingIntervalMs,
     nextDingRemainingMs: ding.nextDingRemainingMs,
     pendingBell: false,
-    bellRings: 0,
+    dingRound: initRoundForStep(steps[0]),
+    bellRound: 0,
     justCompletedStepIds: [],
     resumeAfterStop: null,
   }
@@ -81,6 +84,15 @@ function warningSeconds(step: PracticeStep, config: AppConfig): number {
   return step.durationSec <= config.timer.shortActivityMaxSeconds
     ? config.timer.shortWarningSeconds
     : config.timer.standardWarningSeconds
+}
+
+/** A round-based interval step is one with a per-step ding interval (e.g. Surya Namaskar). */
+function isRoundBased(step: PracticeStep | undefined): boolean {
+  return Boolean(step && step.dingIntervalSec && step.dingIntervalSec > 0)
+}
+
+function initRoundForStep(step: PracticeStep | undefined): number {
+  return isRoundBased(step) ? 1 : 0
 }
 
 export function initDingForStep(
@@ -117,7 +129,8 @@ export function reconcileAt(
   let dingIntervalMs = state.dingIntervalMs
   let nextDingRemainingMs = state.nextDingRemainingMs
   let pendingBell = state.pendingBell
-  let bellRings = state.bellRings
+  let dingRound = state.dingRound
+  let bellRound = state.bellRound
   let consumedMs = 0
   const completedStepIds: string[] = []
   const activeElapsedByStep = { ...state.activeElapsedByStep }
@@ -132,7 +145,8 @@ export function reconcileAt(
     warningEmitted = false
     pendingWarning = null
     pendingBell = false
-    bellRings = 0
+    bellRound = 0
+    dingRound = 0
 
     const next = steps[activityIndex]
     if (!next) {
@@ -151,7 +165,8 @@ export function reconcileAt(
           dingIntervalMs: 0,
           nextDingRemainingMs: null,
           pendingBell: false,
-          bellRings: 0,
+          dingRound: 0,
+          bellRound: 0,
           justCompletedStepIds: completedStepIds,
           resumeAfterStop: null,
         },
@@ -161,6 +176,8 @@ export function reconcileAt(
     const nextDing = initDingForStep(next)
     dingIntervalMs = nextDing.dingIntervalMs
     nextDingRemainingMs = nextDing.nextDingRemainingMs
+    dingRound = initRoundForStep(next)
+    bellRound = 0
     activityRemainingMs = Math.max(1, next.durationSec * 1000)
   }
 
@@ -187,11 +204,12 @@ export function reconcileAt(
       pendingBell = true
       bellJustTriggered = true
       if (dingIntervalMs > 0) {
-        bellRings += 1
+        bellRound = dingRound
+        dingRound += 1
         const nextThreshold: number = nextDingRemainingMs - dingIntervalMs
         nextDingRemainingMs = nextThreshold > 0 ? nextThreshold : null
       } else {
-        bellRings = 1
+        bellRound = 0
         nextDingRemainingMs = null
       }
     }
@@ -215,7 +233,8 @@ export function reconcileAt(
       dingIntervalMs,
       nextDingRemainingMs,
       pendingBell,
-      bellRings,
+      dingRound,
+      bellRound,
       justCompletedStepIds: completedStepIds,
     },
   }
@@ -231,13 +250,27 @@ export function guidedSessionReducer(
     case 'START_FROM': {
       const step = action.steps[action.index]
       const ding = initDingForStep(step)
+      const intervalMs = ding.dingIntervalMs
+      const startRound = intervalMs > 0 ? Math.max(1, action.round ?? 1) : 0
+      const durationMs = (step?.durationSec ?? 0) * 1000
+      const remainingMs = intervalMs > 0
+        ? Math.max(1, durationMs - (startRound - 1) * intervalMs)
+        : durationMs
+      const nextRemaining =
+        intervalMs > 0
+          ? remainingMs > intervalMs
+            ? remainingMs - intervalMs
+            : null
+          : ding.nextDingRemainingMs
       return {
         ...createInitialGuidedState(action.steps),
         status: 'announcing',
         activityIndex: action.index,
-        activityRemainingMs: (step?.durationSec ?? 0) * 1000,
+        activityRemainingMs: remainingMs,
         dingIntervalMs: ding.dingIntervalMs,
-        nextDingRemainingMs: ding.nextDingRemainingMs,
+        nextDingRemainingMs: nextRemaining,
+        dingRound: startRound,
+        bellRound: 0,
       }
     }
     case 'BEGIN_ANNOUNCEMENT':
@@ -250,7 +283,7 @@ export function guidedSessionReducer(
     case 'ACK_WARNING':
       return { ...state, pendingWarning: null }
     case 'ACK_BELL':
-      return { ...state, pendingBell: false }
+      return { ...state, pendingBell: false, bellRound: 0 }
     case 'PAUSE': {
       const reconciled = reconcileAt(state, action.nowMs, action.steps, action.config).state
       if (reconciled.status === 'completed') return reconciled
@@ -286,6 +319,10 @@ export function guidedSessionReducer(
     case 'RESET':
       return createInitialGuidedState(action.steps)
     case 'RESTORE':
-      return { ...action.state, bellRings: action.state.bellRings ?? 0 }
+      return {
+        ...action.state,
+        dingRound: action.state.dingRound ?? 0,
+        bellRound: action.state.bellRound ?? 0,
+      }
   }
 }

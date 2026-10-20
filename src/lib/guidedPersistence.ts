@@ -77,11 +77,13 @@ function validateState(value: unknown, steps: PracticeStep[]): GuidedSessionStat
         ? state.nextDingRemainingMs
         : ding.nextDingRemainingMs,
     pendingBell: false,
-    bellRings:
-      typeof state.bellRings === 'number' &&
-      Number.isFinite(state.bellRings) &&
-      state.bellRings >= 0
-        ? state.bellRings
+    dingRound:
+      typeof state.dingRound === 'number' && Number.isFinite(state.dingRound) && state.dingRound >= 0
+        ? state.dingRound
+        : 0,
+    bellRound:
+      typeof state.bellRound === 'number' && Number.isFinite(state.bellRound) && state.bellRound >= 0
+        ? state.bellRound
         : 0,
     justCompletedStepIds: [],
     resumeAfterStop: null,

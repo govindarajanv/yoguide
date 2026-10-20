@@ -4,7 +4,7 @@ import { CATEGORY_LABELS } from '../lib/schedule'
 type Props = {
   open: boolean
   steps: PracticeStep[]
-  onPick: (index: number) => void
+  onPick: (index: number, round?: number) => void
   onClose: () => void
 }
 
@@ -57,11 +57,33 @@ export function PickSessionDialog({ open, steps, onPick, onClose }: Props) {
                 <ul className="pick-session-activities">
                   {items.map((item) => {
                     const index = steps.indexOf(item)
+                    const roundCount = item.rounds ?? 0
                     return (
-                      <li key={item.id}>
-                        <button type="button" className="pick-session-activity" onClick={() => onPick(index)}>
+                      <li key={item.id} className="pick-session-activity-row">
+                        <button
+                          type="button"
+                          className="pick-session-activity"
+                          onClick={() => onPick(index)}
+                        >
                           {item.name}
                         </button>
+                        {roundCount > 0 && (
+                          <div className="pick-session-rounds">
+                            <span className="pick-session-rounds-label">Start round</span>
+                            <div className="pick-session-rounds-list">
+                              {Array.from({ length: roundCount }, (_, i) => i + 1).map((round) => (
+                                <button
+                                  key={round}
+                                  type="button"
+                                  className="pick-session-round"
+                                  onClick={() => onPick(index, round)}
+                                >
+                                  {round}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </li>
                     )
                   })}
