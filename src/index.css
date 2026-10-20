@@ -564,19 +564,119 @@ button:focus-visible {
   margin-top: 1.6rem !important;
 }
 
-.benefits-muscles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.muscle-map {
+  margin: 0.6rem 0 0.2rem;
 }
 
-.benefits-muscle {
-  padding: 0.45rem 0.75rem;
+.muscle-map-head {
+  margin-bottom: 0.9rem;
+}
+
+.muscle-map-tabs {
+  display: inline-flex;
+  gap: 0.3rem;
+  padding: 0.25rem;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   background: var(--surface);
+}
+
+.muscle-map-tab {
+  min-width: 52px;
+  min-height: 34px;
+  padding: 0.35rem 0.9rem;
+  color: var(--muted);
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.muscle-map-tab.active {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.muscle-map-body {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.muscle-map-svg {
+  width: 170px;
+  height: auto;
+  max-height: 290px;
+  display: block;
+}
+
+.muscle-part {
+  fill: var(--muscle-base, var(--surface-3));
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  transition: fill 300ms ease;
+}
+
+.muscle-part.active {
+  fill: var(--accent);
+  stroke: var(--accent-strong);
+  animation: muscle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes muscle-pulse {
+  0%,
+  100% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 2px var(--accent));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px var(--accent));
+  }
+}
+
+.muscle-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.7rem;
+  align-content: start;
+  padding-top: 0.2rem;
+}
+
+.muscle-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.8rem;
-  font-weight: 600;
+  color: var(--text);
+}
+
+.muscle-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 4px var(--accent);
+}
+
+.muscle-legend-empty {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 520px) {
+  .muscle-map-body {
+    grid-template-columns: 130px 1fr;
+    gap: 0.8rem;
+  }
+
+  .muscle-map-svg {
+    width: 130px;
+  }
 }
 
 .benefits-metabolic {

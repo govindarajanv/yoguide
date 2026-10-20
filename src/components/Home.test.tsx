@@ -44,7 +44,8 @@ describe('Home Chair Mode Toggle', () => {
     expect(screen.getByText('PERSONAL PRACTICE')).toBeInTheDocument()
     expect(screen.getByText('Mat · wall · towel')).toBeInTheDocument()
     expect(screen.getByText('Muscle groups covered today')).toBeInTheDocument()
-    expect(screen.getByText('Core')).toBeInTheDocument()
+    expect(screen.getByText('Core & abs')).toBeInTheDocument()
+    expect(screen.getByText('Shoulders')).toBeInTheDocument()
   })
 
   it('calls onToggleTravelMode when clicking the Chair Yoga toggle', () => {

@@ -8,6 +8,7 @@ import version from '../../VERSION?raw'
 import { ThemeToggle } from './ThemeToggle'
 import { BlocksIcon } from './BlocksIcon'
 import { PickSessionDialog } from './PickSessionDialog'
+import { MuscleMap } from './MuscleMap'
 import {
   DAY_IDS,
   DAY_LABELS,
@@ -196,13 +197,7 @@ export function Home({
 
       <section className="benefits-block">
         <h2>Muscle groups covered today</h2>
-        <div className="benefits-muscles">
-          {dayBenefits.muscles.map((muscle) => (
-            <span key={muscle} className="benefits-muscle">
-              {muscle}
-            </span>
-          ))}
-        </div>
+        <MuscleMap muscles={dayBenefits.muscles} />
 
         <h2 className="benefits-title-2">Benefits if you complete today's practice</h2>
         <p className="benefits-metabolic">
