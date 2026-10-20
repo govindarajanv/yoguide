@@ -568,91 +568,19 @@ button:focus-visible {
 }
 
 .muscle-map {
-  margin: 0.6rem 0 0.2rem;
-}
-
-.muscle-map-head {
-  margin-bottom: 0.9rem;
-}
-
-.muscle-map-tabs {
-  display: inline-flex;
-  gap: 0.3rem;
-  padding: 0.25rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface);
-}
-
-.muscle-map-tab {
-  min-width: 52px;
-  min-height: 34px;
-  padding: 0.35rem 0.9rem;
-  color: var(--muted);
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: color 150ms ease, background 150ms ease;
-}
-
-.muscle-map-tab.active {
-  color: var(--accent-ink);
-  background: var(--accent);
-}
-
-.muscle-map-body {
-  display: grid;
-  grid-template-columns: 170px 1fr;
-  gap: 1.1rem;
-  align-items: start;
-}
-
-.muscle-map-svg {
-  width: 170px;
-  height: auto;
-  max-height: 290px;
-  display: block;
-}
-
-.muscle-part {
-  fill: var(--muscle-base, var(--surface-3));
-  stroke: var(--line-strong);
-  stroke-width: 1;
-  transition: fill 300ms ease;
-}
-
-.muscle-part.active {
-  fill: var(--accent);
-  stroke: var(--accent-strong);
-  animation: muscle-pulse 2s ease-in-out infinite;
-}
-
-@keyframes muscle-pulse {
-  0%,
-  100% {
-    opacity: 0.82;
-    filter: drop-shadow(0 0 2px var(--accent));
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 7px var(--accent));
-  }
+  margin: 0.4rem 0 0.2rem;
 }
 
 .muscle-map-panel {
   display: grid;
-  gap: 0.75rem;
-  align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.9rem;
   min-width: 0;
 }
 
 .muscle-region-card {
-  padding: 0.7rem 0.85rem;
+  padding: 0.85rem 1rem;
   border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
   border-radius: 12px;
   background: var(--surface);
 }
@@ -660,23 +588,23 @@ button:focus-visible {
 .muscle-region-title {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin: 0 0 0.4rem;
-  font-size: 0.85rem;
+  gap: 0.5rem;
+  margin: 0 0 0.55rem;
+  font-size: 0.88rem;
   font-weight: 800;
 }
 
 .muscle-region-activities {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem 0.5rem;
+  gap: 0.35rem 0.55rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .muscle-region-activities li {
-  padding: 0.18rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
   background: var(--subtle-bg);
   border: 1px solid var(--line);
@@ -689,28 +617,11 @@ button:focus-visible {
   height: 9px;
   border-radius: 999px;
   background: var(--accent);
-  box-shadow: 0 0 4px var(--accent);
 }
 
 .muscle-legend-empty {
   color: var(--muted);
   font-size: 0.82rem;
-}
-
-@media (max-width: 600px) {
-  .muscle-map-body {
-    grid-template-columns: 1fr;
-    gap: 0.9rem;
-  }
-
-  .muscle-map-figure {
-    display: flex;
-    justify-content: center;
-  }
-
-  .muscle-map-svg {
-    width: 150px;
-  }
 }
 
 .benefits-metabolic {

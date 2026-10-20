@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { PracticeStep } from '../lib/types'
 import { MuscleMap } from './MuscleMap'
@@ -18,21 +18,7 @@ function step(name: string): PracticeStep {
 }
 
 describe('MuscleMap', () => {
-  it('renders front view by default with front toggles', () => {
-    render(<MuscleMap steps={[step('Planks')]} />)
-    expect(screen.getByRole('tab', { name: 'Front' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('tab', { name: 'Back' })).toHaveAttribute('aria-selected', 'false')
-  })
-
-  it('switches to back view when Back is selected and lists activities', () => {
-    render(<MuscleMap steps={[step('Bridges')]} />)
-    fireEvent.click(screen.getByRole('tab', { name: 'Back' }))
-    expect(screen.getByRole('tab', { name: 'Back' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByText('Glutes')).toBeInTheDocument()
-    expect(screen.getAllByText('Bridges').length).toBeGreaterThan(0)
-  })
-
-  it('lists all activities that cover a muscle region', () => {
+  it('lists every muscle region with the activities that cover it', () => {
     render(<MuscleMap steps={[step('Planks'), step('Bird Dog')]} />)
     expect(screen.getByText('Core & abs')).toBeInTheDocument()
     expect(screen.getAllByText('Planks').length).toBeGreaterThan(0)
@@ -44,5 +30,10 @@ describe('MuscleMap', () => {
     expect(screen.getByText('Head & neck')).toBeInTheDocument()
     expect(screen.getByText('Shoulders')).toBeInTheDocument()
     expect(screen.getByText('Chest & breath')).toBeInTheDocument()
+  })
+
+  it('shows an empty message when no regions are highlighted', () => {
+    render(<MuscleMap steps={[]} />)
+    expect(screen.getByText('No body regions highlighted this day.')).toBeInTheDocument()
   })
 })
