@@ -197,7 +197,7 @@ export function Home({
 
       <section className="benefits-block">
         <h2>Muscle groups covered today</h2>
-        <MuscleMap muscles={dayBenefits.muscles} />
+        <MuscleMap steps={practiceSteps} />
 
         <h2 className="benefits-title-2">Benefits if you complete today's practice</h2>
         <p className="benefits-metabolic">

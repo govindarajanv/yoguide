@@ -1,22 +1,24 @@
 import { useMemo, useState, type ReactElement } from 'react'
+import { getActivityBenefit } from '../data/activityBenefits'
+import type { PracticeStep } from '../lib/types'
 
 type View = 'front' | 'back'
 
 const KEYWORDS: Record<string, string[]> = {
   head: ['head', 'neck', 'face', 'jaw', 'eye', 'tongue', 'throat'],
-  shoulders: ['shoulder', 'rotator cuff', 'deltoid', 'trapezius', 'rear deltoid', 'upper back'],
+  shoulders: ['shoulder', 'rotator cuff', 'deltoid', 'trapezius', 'upper back'],
   arms: ['arm', 'tricep', 'bicep', 'forearm', 'elbow'],
   hands: ['hand', 'finger', 'thumb', 'wrist'],
   chest: ['chest', 'rib', 'diaphragm', 'breath', 'posture'],
   core: ['core', 'obli', 'abdom', 'side body', 'waist'],
-  hips: ['hip', 'pelvis', 'outer hip'],
-  frontThighs: ['quadriceps', 'quad', 'thigh', 'adductor', 'inner thigh', 'hip flexor'],
+  hips: ['hip', 'pelvis', 'outer hip', 'pelvic'],
+  frontThighs: ['quadriceps', 'quad', 'front thigh', 'thigh', 'adductor', 'inner thigh', 'hip flexor'],
   shins: ['shin', 'tibialis'],
   feet: ['foot', 'ankle', 'toe', 'heel'],
   upperBack: ['upper back', 'trapezius', 'rhomboid', 'rear deltoid', 'shoulder'],
   lowerBack: ['lower back', 'spine', 'spinal', 'erector', 'sciatic'],
   glutes: ['glute', 'outer hip', 'pelvis', 'hip'],
-  backThighs: ['hamstring', 'thigh'],
+  backThighs: ['hamstring', 'back thigh', 'thigh'],
   calves: ['calf', 'achilles', 'shin'],
 }
 
@@ -34,71 +36,90 @@ const LABELS: Record<string, string> = {
   upperBack: 'Upper back',
   lowerBack: 'Lower back',
   glutes: 'Glutes',
-  backThighs: 'Back thighs (hamstrings)',
+  backThighs: 'Back of thighs',
   calves: 'Calves',
 }
 
+/** A fuller region list on the figure so labels stay readable on the preferred side. */
 const FRONT: Array<{ id: string; el: ReactElement }> = [
-  { id: 'head', el: <ellipse cx="100" cy="28" rx="22" ry="25" /> },
-  { id: 'shoulders', el: <path d="M74 82 Q74 74 84 74 L116 74 Q126 74 126 82 L126 96 Q126 102 118 102 L82 102 Q74 102 74 96 Z" /> },
-  { id: 'arms', el: <rect x="56" y="84" width="15" height="76" rx="7" /> },
-  { id: 'arms', el: <rect x="129" y="84" width="15" height="76" rx="7" /> },
-  { id: 'chest', el: <path d="M82 96 L118 96 Q124 96 124 104 L120 132 Q120 140 112 142 L88 142 Q80 140 80 132 L76 104 Q76 96 82 96 Z" /> },
-  { id: 'core', el: <path d="M86 142 L114 142 Q120 142 120 150 L118 176 Q118 182 112 184 L88 184 Q82 182 82 176 L80 150 Q80 142 86 142 Z" /> },
-  { id: 'hips', el: <path d="M80 184 L120 184 Q126 184 126 192 L124 204 Q124 210 116 210 L84 210 Q76 210 76 204 L74 192 Q74 184 80 184 Z" /> },
-  { id: 'arms', el: <rect x="63" y="160" width="15" height="14" rx="7" /> },
-  { id: 'hands', el: <circle cx="75" cy="178" r="8" /> },
-  { id: 'hands', el: <circle cx="125" cy="178" r="8" /> },
-  { id: 'frontThighs', el: <rect x="83" y="210" width="22" height="56" rx="10" /> },
-  { id: 'frontThighs', el: <rect x="109" y="210" width="22" height="56" rx="10" /> },
-  { id: 'shins', el: <rect x="85" y="270" width="20" height="40" rx="9" /> },
-  { id: 'shins', el: <rect x="109" y="270" width="20" height="40" rx="9" /> },
-  { id: 'feet', el: <ellipse cx="95" cy="320" rx="17" ry="8" /> },
-  { id: 'feet', el: <ellipse cx="119" cy="320" rx="17" ry="8" /> },
+  { id: 'head', el: <ellipse cx="100" cy="30" rx="21" ry="24" /> },
+  { id: 'shoulders', el: <ellipse cx="100" cy="92" rx="52" ry="22" /> },
+  { id: 'arms', el: <rect x="50" y="96" width="16" height="78" rx="8" /> },
+  { id: 'arms', el: <rect x="134" y="96" width="16" height="78" rx="8" /> },
+  { id: 'hands', el: <circle cx="58" cy="180" r="8" /> },
+  { id: 'hands', el: <circle cx="142" cy="180" r="8" /> },
+  { id: 'chest', el: <ellipse cx="100" cy="128" rx="33" ry="26" /> },
+  { id: 'core', el: <ellipse cx="100" cy="160" rx="24" ry="20" /> },
+  { id: 'hips', el: <ellipse cx="100" cy="194" rx="32" ry="16" /> },
+  { id: 'frontThighs', el: <rect x="81" y="206" width="20" height="60" rx="10" /> },
+  { id: 'frontThighs', el: <rect x="99" y="206" width="20" height="60" rx="10" /> },
+  { id: 'shins', el: <rect x="83" y="272" width="17" height="44" rx="8" /> },
+  { id: 'shins', el: <rect x="100" y="272" width="17" height="44" rx="8" /> },
+  { id: 'feet', el: <ellipse cx="91" cy="326" rx="18" ry="8" /> },
+  { id: 'feet', el: <ellipse cx="109" cy="326" rx="18" ry="8" /> },
 ]
 
 const BACK: Array<{ id: string; el: ReactElement }> = [
-  { id: 'head', el: <ellipse cx="100" cy="28" rx="22" ry="25" /> },
-  { id: 'upperBack', el: <path d="M76 76 Q76 70 86 70 L114 70 Q124 70 124 76 L126 110 Q126 118 118 120 L82 120 Q74 118 74 110 Z" /> },
-  { id: 'arms', el: <rect x="56" y="84" width="15" height="76" rx="7" /> },
-  { id: 'arms', el: <rect x="129" y="84" width="15" height="76" rx="7" /> },
-  { id: 'lowerBack', el: <path d="M82 120 L118 120 Q124 120 124 128 L122 156 Q122 162 114 164 L86 164 Q78 162 78 156 L76 128 Q76 120 82 120 Z" /> },
-  { id: 'glutes', el: <path d="M78 164 L122 164 Q128 164 128 172 L126 192 Q126 198 116 200 L84 200 Q74 198 74 192 L72 172 Q72 164 78 164 Z" /> },
-  { id: 'arms', el: <rect x="63" y="160" width="15" height="14" rx="7" /> },
-  { id: 'hands', el: <circle cx="75" cy="178" r="8" /> },
-  { id: 'hands', el: <circle cx="125" cy="178" r="8" /> },
-  { id: 'backThighs', el: <rect x="83" y="200" width="22" height="52" rx="10" /> },
-  { id: 'backThighs', el: <rect x="109" y="200" width="22" height="52" rx="10" /> },
-  { id: 'calves', el: <rect x="84" y="256" width="21" height="46" rx="9" /> },
-  { id: 'calves', el: <rect x="109" y="256" width="21" height="46" rx="9" /> },
-  { id: 'feet', el: <ellipse cx="95" cy="314" rx="17" ry="8" /> },
-  { id: 'feet', el: <ellipse cx="119" cy="314" rx="17" ry="8" /> },
+  { id: 'head', el: <ellipse cx="100" cy="30" rx="21" ry="24" /> },
+  { id: 'upperBack', el: <ellipse cx="100" cy="96" rx="42" ry="30" /> },
+  { id: 'arms', el: <rect x="50" y="96" width="16" height="78" rx="8" /> },
+  { id: 'arms', el: <rect x="134" y="96" width="16" height="78" rx="8" /> },
+  { id: 'hands', el: <circle cx="58" cy="180" r="8" /> },
+  { id: 'hands', el: <circle cx="142" cy="180" r="8" /> },
+  { id: 'lowerBack', el: <ellipse cx="100" cy="140" rx="28" ry="24" /> },
+  { id: 'glutes', el: <ellipse cx="100" cy="188" rx="34" ry="18" /> },
+  { id: 'backThighs', el: <rect x="81" y="202" width="20" height="56" rx="10" /> },
+  { id: 'backThighs', el: <rect x="99" y="202" width="20" height="56" rx="10" /> },
+  { id: 'calves', el: <rect x="83" y="262" width="18" height="50" rx="9" /> },
+  { id: 'calves', el: <rect x="99" y="262" width="18" height="50" rx="9" /> },
+  { id: 'feet', el: <ellipse cx="91" cy="322" rx="18" ry="8" /> },
+  { id: 'feet', el: <ellipse cx="109" cy="322" rx="18" ry="8" /> },
 ]
 
-function activeSet(muscles: string[]): Set<string> {
-  const lower = muscles.map((m) => m.toLowerCase())
-  const fullBody = lower.some((m) =>
-    /full body|whole-body|whole body|cardiovascular|circulation/.test(m),
-  )
-  const active = new Set<string>()
-  if (fullBody) {
-    for (const id of Object.keys(KEYWORDS)) active.add(id)
-    return active
-  }
-  for (const [id, kw] of Object.entries(KEYWORDS)) {
-    if (lower.some((m) => kw.some((k) => m.includes(k)))) active.add(id)
-  }
-  return active
+const ALL_IDS = Object.keys(KEYWORDS)
+
+function isFullBody(muscle: string): boolean {
+  return /full body|whole-body|whole body|cardiovascular|circulation/.test(muscle.toLowerCase())
 }
 
-export function MuscleMap({ muscles }: { muscles: string[] }) {
-  const [view, setView] = useState<View>('front')
-  const active = useMemo(() => activeSet(muscles), [muscles])
-  const regions = view === 'front' ? FRONT : BACK
+function regionIdsForMuscle(muscle: string): string[] {
+  if (isFullBody(muscle)) return ALL_IDS
+  const lower = muscle.toLowerCase()
+  return ALL_IDS.filter((id) => KEYWORDS[id].some((k) => lower.includes(k)))
+}
 
-  const legend = [...new Set(regions.map((r) => r.id))]
-    .map((id) => ({ id, label: LABELS[id] }))
-    .filter((r) => active.has(r.id))
+/**
+ * Map every body region to the list of activity names that cover it for the day.
+ * Uses each activity's curated muscle benefit (primary + secondary targets).
+ */
+function buildRegionActivities(steps: PracticeStep[]): Record<string, Set<string>> {
+  const map: Record<string, Set<string>> = {}
+  for (const step of steps) {
+    const benefit = getActivityBenefit(step)
+    for (const target of [benefit.primary, ...benefit.secondary]) {
+      for (const id of regionIdsForMuscle(target)) {
+        if (!map[id]) map[id] = new Set()
+        map[id].add(step.name)
+      }
+    }
+  }
+  return map
+}
+
+export function MuscleMap({ steps }: { steps: PracticeStep[] }) {
+  const [view, setView] = useState<View>('front')
+
+  const regionActivities = useMemo(() => buildRegionActivities(steps), [steps])
+  const active = useMemo(() => {
+    const set = new Set<string>()
+    for (const id of ALL_IDS) if (regionActivities[id] && regionActivities[id].size > 0) set.add(id)
+    return set
+  }, [regionActivities])
+
+  const regions = view === 'front' ? FRONT : BACK
+  const panelIds = [...new Set(regions.map((r) => r.id))]
+    .filter((id) => active.has(id))
+    .sort((a, b) => LABELS[a].localeCompare(LABELS[b]))
 
   return (
     <div className="muscle-map">
@@ -120,29 +141,41 @@ export function MuscleMap({ muscles }: { muscles: string[] }) {
       </div>
 
       <div className="muscle-map-body">
-        <svg
-          viewBox="0 0 200 340"
-          role="img"
-          aria-label={`Body map highlighting ${legend.length} covered muscle regions`}
-          className="muscle-map-svg"
-        >
-          {regions.map((region, i) => (
-            <g key={`${region.id}-${i}`} className={`muscle-part ${active.has(region.id) ? 'active' : ''}`}>
-              {region.el}
-            </g>
-          ))}
-        </svg>
+        <div className="muscle-map-figure">
+          <svg
+            viewBox="0 0 200 342"
+            role="img"
+            aria-label={`Body map highlighting ${active.size} covered muscle regions`}
+            className="muscle-map-svg"
+          >
+            {regions.map((region, i) => (
+              <g
+                key={`${region.id}-${i}`}
+                className={`muscle-part ${active.has(region.id) ? 'active' : ''}`}
+              >
+                {region.el}
+              </g>
+            ))}
+          </svg>
+        </div>
 
-        <div className="muscle-map-legend">
-          {legend.length > 0 ? (
-            legend.map((r) => (
-              <span key={r.id} className="muscle-legend-item">
-                <i className="muscle-legend-dot" aria-hidden="true" />
-                {r.label}
-              </span>
+        <div className="muscle-map-panel">
+          {panelIds.length > 0 ? (
+            panelIds.map((id) => (
+              <div key={id} className="muscle-region-card">
+                <h3 className="muscle-region-title">
+                  <i className="muscle-legend-dot" aria-hidden="true" />
+                  {LABELS[id]}
+                </h3>
+                <ul className="muscle-region-activities">
+                  {[...regionActivities[id]].map((name) => (
+                    <li key={name}>{name}</li>
+                  ))}
+                </ul>
+              </div>
             ))
           ) : (
-            <span className="muscle-legend-empty">No body regions highlighted this day.</span>
+            <p className="muscle-legend-empty">No body regions highlighted this day.</p>
           )}
         </div>
       </div>
