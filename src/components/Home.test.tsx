@@ -22,7 +22,9 @@ describe('Home Chair Mode Toggle', () => {
     guidedElapsedMs: 0,
     guidedCalories: 0,
     travelMode: false,
+    periodicMode: false,
     onToggleTravelMode: vi.fn(),
+    onTogglePeriodicMode: vi.fn(),
     onStartGuided: vi.fn(),
     onStartFrom: vi.fn(),
     onOpenGuided: vi.fn(),
@@ -39,7 +41,7 @@ describe('Home Chair Mode Toggle', () => {
     const toggle = screen.getByRole('switch', { name: 'Toggle chair mode' })
     expect(toggle).toBeInTheDocument()
     expect(toggle).toHaveAttribute('aria-checked', 'false')
-    expect(screen.getByText('OFF')).toBeInTheDocument()
+    expect(screen.getAllByText('OFF')).toHaveLength(2)
     expect(screen.getByText('Wednesday')).toBeInTheDocument()
     expect(screen.getByText('PERSONAL PRACTICE')).toBeInTheDocument()
     expect(screen.getByText('Mat · wall · towel')).toBeInTheDocument()
@@ -70,5 +72,23 @@ describe('Home Chair Mode Toggle', () => {
     expect(screen.getByText('CHAIR MODE')).toBeInTheDocument()
     expect(screen.getByText('Chair · comfortable clothes')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Chair Yoga activities' })).toBeInTheDocument()
+  })
+
+  it('calls onTogglePeriodicMode when clicking the Periodic Stretches toggle', () => {
+    const onTogglePeriodicMode = vi.fn()
+    render(<Home {...baseProps} onTogglePeriodicMode={onTogglePeriodicMode} />)
+    const toggle = screen.getByRole('switch', { name: 'Toggle periodic stretches' })
+    fireEvent.click(toggle)
+    expect(onTogglePeriodicMode).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders Periodic Stretches view when periodicMode is true', () => {
+    render(<Home {...baseProps} periodicMode={true} totalSec={720} totalSteps={6} />)
+    const toggle = screen.getByRole('switch', { name: 'Toggle periodic stretches' })
+    expect(toggle).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('heading', { level: 1, name: /Periodic Stretches/i })).toBeInTheDocument()
+    expect(screen.getByText('PERIODIC STRETCHES')).toBeInTheDocument()
+    expect(screen.getByText('Wall · chair · windowsill')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Periodic Stretches activities' })).toBeInTheDocument()
   })
 })

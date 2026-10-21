@@ -1,0 +1,13 @@
+profile:
+  weightKg: 80
+
+timer:
+  shortActivityMaxSeconds: 30
+  shortWarningSeconds: 3
+  standardWarningSeconds: 5
+
+met:
+  default: 2.5
+  categories:
+    coolDown: 2.5
+  activities: {}

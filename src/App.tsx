@@ -9,8 +9,9 @@ import { StopSessionDialog } from './components/StopSessionDialog'
 import { Today } from './components/Today'
 import { Week } from './components/Week'
 import { VoiceSettings } from './components/VoiceSettings'
-import { APP_CONFIG } from './config/appConfig'
+import { APP_CONFIG, type AppConfig } from './config/appConfig'
 import { CHAIR_YOGA_CONFIG } from './config/chairYogaConfig'
+import { PERIODIC_STRETCHES_CONFIG } from './config/periodicStretchesConfig'
 import { useGuidedSession } from './hooks/useGuidedSession'
 import { useTheme } from './hooks/useTheme'
 import { buildDayBenefits } from './lib/dayBenefits'
@@ -31,12 +32,14 @@ import {
   chairYogaPlan,
   jsDayToDayId,
   localDateKey,
+  periodicStretchesPlan,
   planForDay,
   totalDurationSec,
 } from './lib/schedule'
 import { buildCategorySummaries } from './lib/sessionAnalytics'
 
 type View = 'home' | 'practice' | 'week' | 'today'
+type Mode = 'standard' | 'chair' | 'periodic'
 
 export default function App() {
   const today = useMemo(() => jsDayToDayId(new Date().getDay()), [])
@@ -45,21 +48,26 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState(today)
   const [previewDay, setPreviewDay] = useState(today)
   const [travelMode, setTravelMode] = useState<boolean>(false)
+  const [periodicMode, setPeriodicMode] = useState<boolean>(false)
+  const mode: Mode = periodicMode ? 'periodic' : travelMode ? 'chair' : 'standard'
 
   const activeDateKey = useMemo(
-    () => (travelMode ? `${dateKey}:chair` : dateKey),
-    [travelMode, dateKey],
+    () => (mode === 'chair' ? `${dateKey}:chair` : mode === 'periodic' ? `${dateKey}:periodic` : dateKey),
+    [mode, dateKey],
   )
-  const roundsKey = travelMode ? 'chair-surya-namaskar' : 'surya-namaskar'
+  const roundsKey = mode === 'chair' ? 'chair-surya-namaskar' : 'surya-namaskar'
 
   const [progress, setProgress] = useState<DayProgress>(() => loadProgress(activeDateKey))
   const [rounds, setRounds] = useState(() => loadRounds(activeDateKey, roundsKey))
   const [complete, setComplete] = useState(() => isSessionComplete(activeDateKey))
 
   const chairSteps = useMemo(() => chairYogaPlan(), [])
+  const periodicSteps = useMemo(() => periodicStretchesPlan(), [])
   const regularSteps = useMemo(() => planForDay(selectedDay), [selectedDay])
-  const practiceSteps = travelMode ? chairSteps : regularSteps
-  const activeConfig = travelMode ? CHAIR_YOGA_CONFIG : APP_CONFIG
+  const practiceSteps =
+    mode === 'periodic' ? periodicSteps : mode === 'chair' ? chairSteps : regularSteps
+  const activeConfig: AppConfig =
+    mode === 'periodic' ? PERIODIC_STRETCHES_CONFIG : mode === 'chair' ? CHAIR_YOGA_CONFIG : APP_CONFIG
 
   useEffect(() => {
     setProgress(loadProgress(activeDateKey))
@@ -153,6 +161,13 @@ export default function App() {
 
   const handleToggleTravelMode = useCallback(() => {
     setTravelMode((prev) => !prev)
+    setPeriodicMode(false)
+    guided.reset()
+  }, [guided])
+
+  const handleTogglePeriodicMode = useCallback(() => {
+    setPeriodicMode((prev) => !prev)
+    setTravelMode(false)
     guided.reset()
   }, [guided])
 
@@ -173,7 +188,8 @@ export default function App() {
           steps={practiceSteps}
           progress={progress}
           rounds={rounds}
-          travelMode={travelMode}
+          travelMode={mode === 'chair'}
+          periodicMode={mode === 'periodic'}
           onToggle={onToggle}
           onRounds={handleRounds}
           onBack={() => setView('home')}
@@ -208,7 +224,8 @@ export default function App() {
         day={selectedDay}
         today={today}
         progress={progress}
-        travelMode={travelMode}
+        travelMode={mode === 'chair'}
+        periodicMode={mode === 'periodic'}
         onBack={() => setView('home')}
         onOpenPractice={() => setView('practice')}
         theme={theme}
@@ -251,8 +268,10 @@ export default function App() {
         guidedStatus={guided.state.status}
         guidedElapsedMs={guided.state.totalActiveMs}
         guidedCalories={guided.calories}
-        travelMode={travelMode}
+        travelMode={mode === 'chair'}
+        periodicMode={mode === 'periodic'}
         onToggleTravelMode={handleToggleTravelMode}
+        onTogglePeriodicMode={handleTogglePeriodicMode}
         onStartGuided={startGuided}
         onStartFrom={startFromGuided}
         onOpenGuided={() => setView('practice')}

@@ -1,5 +1,6 @@
 import { SCHEDULE_STEPS } from '../data/schedule'
 import { CHAIR_YOGA_STEPS } from '../data/chairYogaSchedule'
+import { PERIODIC_STRETCHES_STEPS } from '../data/periodicStretchesSchedule'
 import type { Category, DayDiff, DayId, DayTrack, PracticeStep, StepDef } from './types'
 
 export const DAY_IDS: DayId[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
@@ -117,6 +118,26 @@ export function blocksForChairYoga(): PlanBlock[] {
     { label: 'Block 1', name: 'Practice', steps: plan.slice(0, endOfFirst) },
     { label: 'Block 2', name: 'Wind-down', steps: plan.slice(endOfFirst) },
   ]
+}
+
+export function periodicStretchesPlan(): PracticeStep[] {
+  return PERIODIC_STRETCHES_STEPS.map((def) => ({
+    id: def.id,
+    category: def.category,
+    name: def.name ?? '',
+    sets: def.sets,
+    reps: def.reps,
+    durationSec: def.durationSec,
+    cue: def.cue,
+    rounds: def.rounds,
+    dingIntervalSec: def.dingIntervalSec,
+    dingGain: def.dingGain,
+    finalWarningSec: def.finalWarningSec,
+  }))
+}
+
+export function blocksForPeriodicStretches(): PlanBlock[] {
+  return [{ label: '', name: 'Periodic Stretches', steps: periodicStretchesPlan() }]
 }
 
 export function formatDuration(totalSec: number): string {

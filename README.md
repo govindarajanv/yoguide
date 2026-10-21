@@ -34,6 +34,17 @@ npm run preview
 - A floating card shows general body targets during guided activities.
 - Completed sessions show active-time and estimated-calorie charts by section.
 
+## Alternate sections
+
+- **Chair mode** (Chair Yoga) is a separate ~20-minute chair routine.
+- **Periodic Stretches** is a separate optional micro-practice of six 2-minute
+  gentle stretches, toggled from the home screen. Each activity can be played
+  individually via **Pick your session** with the same voice cues as other sections.
+
+The chair and periodic schedules live in
+[`src/data/chairYogaSchedule.ts`](./src/data/chairYogaSchedule.ts) and
+[`src/data/periodicStretchesSchedule.ts`](./src/data/periodicStretchesSchedule.ts).
+
 Edit [`config/app.yaml`](./config/app.yaml) to change the local profile, warning thresholds, or MET values. The configured body weight is **80 kg**.
 
 Voice uses the browser Web Speech API. If it is unavailable, visible timers and cues continue normally.

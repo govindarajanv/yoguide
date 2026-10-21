@@ -13,6 +13,7 @@ import {
   DAY_IDS,
   DAY_LABELS,
   blocksForDay,
+  blocksForPeriodicStretches,
   formatDuration,
   trackForDay,
   trackLabel,
@@ -31,7 +32,9 @@ type Props = {
   guidedElapsedMs: number
   guidedCalories: number
   travelMode: boolean
+  periodicMode: boolean
   onToggleTravelMode: () => void
+  onTogglePeriodicMode: () => void
   onStartGuided: () => void
   onStartFrom: (index: number, round?: number) => void
   onOpenGuided: () => void
@@ -56,7 +59,9 @@ export function Home({
   guidedElapsedMs,
   guidedCalories,
   travelMode,
+  periodicMode,
   onToggleTravelMode,
+  onTogglePeriodicMode,
   onStartGuided,
   onStartFrom,
   onOpenGuided,
@@ -68,7 +73,11 @@ export function Home({
   onToggleTheme,
 }: Props) {
   const track = trackForDay(day)
-  const blockCount = travelMode ? 2 : blocksForDay(day).length
+  const blockCount = periodicMode
+    ? blocksForPeriodicStretches().length
+    : travelMode
+      ? 2
+      : blocksForDay(day).length
   const guidedRunning = ['announcing', 'running', 'stop-confirmation'].includes(guidedStatus)
   const guidedResumable = guidedStatus === 'paused' || guidedStatus === 'saved'
   const guidedComplete = guidedStatus === 'completed'
@@ -88,17 +97,36 @@ export function Home({
             role="switch"
             aria-checked={travelMode}
             aria-label="Toggle chair mode"
-            className={`travel-toggle ${travelMode ? 'travel-toggle-active' : ''}`}
+            className={`mode-toggle ${travelMode ? 'mode-toggle-active' : ''}`}
             onClick={onToggleTravelMode}
             title={travelMode ? 'Turn chair mode off' : 'Turn chair mode on (Chair Yoga)'}
           >
-            <span className="travel-toggle-icon">🧘</span>
-            <span className="travel-toggle-label">Chair mode</span>
-            <span className={`travel-toggle-badge ${travelMode ? 'badge-on' : 'badge-off'}`}>
+            <span className="mode-toggle-icon">🧘</span>
+            <span className="mode-toggle-label">Chair mode</span>
+            <span className={`mode-toggle-badge ${travelMode ? 'badge-on' : 'badge-off'}`}>
               {travelMode ? 'ON' : 'OFF'}
             </span>
           </button>
-          {!travelMode && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={periodicMode}
+            aria-label="Toggle periodic stretches"
+            className={`mode-toggle ${periodicMode ? 'mode-toggle-active' : ''}`}
+            onClick={onTogglePeriodicMode}
+            title={
+              periodicMode
+                ? 'Turn periodic stretches off'
+                : 'Turn on Periodic Stretches (separate micro-practice)'
+            }
+          >
+            <span className="mode-toggle-icon">🧘</span>
+            <span className="mode-toggle-label">Periodic Stretches</span>
+            <span className={`mode-toggle-badge ${periodicMode ? 'badge-on' : 'badge-off'}`}>
+              {periodicMode ? 'ON' : 'OFF'}
+            </span>
+          </button>
+          {!travelMode && !periodicMode && (
             <label className="day-select">
               <span className="day-select-label">Practice day</span>
               <select
@@ -116,15 +144,25 @@ export function Home({
             </label>
           )}
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-          <span className="week-badge">{travelMode ? 'CHAIR MODE' : 'PERSONAL PRACTICE'}</span>
+          <span className="week-badge">
+            {periodicMode
+              ? 'PERIODIC STRETCHES'
+              : travelMode
+                ? 'CHAIR MODE'
+                : 'PERSONAL PRACTICE'}
+          </span>
         </div>
       </header>
       <div className="home-heading">
         <BlocksIcon count={blockCount} />
         <h1 className="home-title">
-          {travelMode ? 'Chair Yoga' : DAY_LABELS[day]}
+          {periodicMode ? 'Periodic Stretches' : travelMode ? 'Chair Yoga' : DAY_LABELS[day]}
           <span className="home-track">
-            {travelMode ? 'Chair Yoga · 20 min' : trackLabel(track)}
+            {periodicMode
+              ? 'Periodic Stretches · 12 min'
+              : travelMode
+                ? 'Chair Yoga · 20 min'
+                : trackLabel(track)}
           </span>
         </h1>
       </div>
@@ -186,9 +224,13 @@ export function Home({
           Manual practice
         </button>
         <button type="button" className="btn btn-ghost" onClick={onOpenToday}>
-          {travelMode ? 'Chair Yoga activities' : "Today's activities"}
+          {periodicMode
+            ? 'Periodic Stretches activities'
+            : travelMode
+              ? 'Chair Yoga activities'
+              : "Today's activities"}
         </button>
-        {!travelMode && (
+        {!travelMode && !periodicMode && (
           <button type="button" className="btn btn-ghost" onClick={onOpenWeek}>
             Week
           </button>
@@ -211,7 +253,13 @@ export function Home({
         </ul>
       </section>
 
-      <p className="equip">{travelMode ? 'Chair · comfortable clothes' : 'Mat · wall · towel'}</p>
+      <p className="equip">
+        {periodicMode
+          ? 'Wall · chair · windowsill'
+          : travelMode
+            ? 'Chair · comfortable clothes'
+            : 'Mat · wall · towel'}
+      </p>
     </section>
   )
 }

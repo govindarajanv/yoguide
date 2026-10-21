@@ -93,6 +93,11 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   Kapalapaathi: { primary: 'Diaphragm', secondary: ['Abdominal wall', 'Breath control'] },
   'Naadi Shuddhi': { primary: 'Breath control', secondary: ['Focus', 'Diaphragm', 'Nervous system'] },
   'Slow Breathing': { primary: 'Breath control & relaxation', secondary: ['Nervous system', 'Diaphragm'] },
+  'Legs on the wall': { primary: 'Hamstrings & calves', secondary: ['Lower back', 'Circulation'] },
+  'Legs on the corner': { primary: 'Inner thighs', secondary: ['Hamstrings', 'Hips', 'Lower back'] },
+  'Seated Leg Lift': { primary: 'Quadriceps & hip flexors', secondary: ['Core', 'Knees'] },
+  'Legs on windows': { primary: 'Hamstrings & calves', secondary: ['Lower back', 'Circulation'] },
+  'Half Forward fold - wall': { primary: 'Hamstrings', secondary: ['Spine', 'Shoulders', 'Calves'] },
 }
 
 const CATEGORY_FALLBACKS: Record<Category, ActivityBenefit> = {

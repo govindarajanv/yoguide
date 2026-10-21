@@ -12,6 +12,7 @@ Personal static SPA that helps follow a ~47-minute daily yoga/fitness schedule s
 - "Muscle groups covered today" lists body sections (e.g. Arms) each with the count of activities that train it: `Arms (9)`
 - Optional guided mode: voice cues, per-activity countdown, overall active timer, fixed controls, and MET calorie estimate
 - **Pick your session** starts guided mode from any section or single activity; round-based activities (Surya Namaskar) can start from a chosen round
+- **Periodic Stretches** is a separate optional micro-practice (six 2-minute gentle stretches) toggled from the home screen — it is never merged into the daily schedule. Any single activity can be played individually via Pick your session (voice works the same as other sections).
 - Round-based activities ring a **single bell** per round then announce the round number (voice); non-round activities ring once at midpoint
 - Voice and speed preferences are local; narration is title + time only (+ round number for Surya)
 - Guided activities show curated general body targets; completed sessions show category charts
@@ -23,6 +24,8 @@ Personal static SPA that helps follow a ~47-minute daily yoga/fitness schedule s
 
 - Vite + React + TypeScript
 - Schedule data: `src/data/schedule.ts`
+- Chair yoga data: `src/data/chairYogaSchedule.ts`
+- Periodic Stretches data: `src/data/periodicStretchesSchedule.ts`
 - Day logic: `src/lib/schedule.ts`
 - Progress: `src/lib/progress.ts`
 - Guided state: `src/hooks/useGuidedSession.ts`, `src/hooks/guidedSessionReducer.ts`

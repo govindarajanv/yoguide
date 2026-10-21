@@ -17,6 +17,7 @@ type Props = {
   progress: DayProgress
   rounds: number
   travelMode?: boolean
+  periodicMode?: boolean
   onToggle: (stepId: string) => void
   onRounds: (next: number) => void
   onBack: () => void
@@ -39,6 +40,7 @@ export function Practice({
   progress,
   rounds,
   travelMode = false,
+  periodicMode = false,
   onToggle,
   onRounds,
   onBack,
@@ -66,7 +68,13 @@ export function Practice({
           Home
         </button>
         <div className="practice-bar-mid">
-          <strong>{travelMode ? 'Chair Yoga' : DAY_LABELS[day]}</strong>
+          <strong>
+            {periodicMode
+              ? 'Periodic Stretches'
+              : travelMode
+                ? 'Chair Yoga'
+                : DAY_LABELS[day]}
+          </strong>
           <span>
             {done}/{steps.length} · {formatDuration(totalDurationSec(steps))}
           </span>

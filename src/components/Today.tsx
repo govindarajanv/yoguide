@@ -7,6 +7,7 @@ import {
   DAY_LABELS,
   blocksForChairYoga,
   blocksForDay,
+  blocksForPeriodicStretches,
   formatDuration,
   totalDurationSec,
   trackForDay,
@@ -18,6 +19,7 @@ type Props = {
   today: DayId
   progress: DayProgress
   travelMode?: boolean
+  periodicMode?: boolean
   onBack: () => void
   onOpenPractice: () => void
   theme: Theme
@@ -34,12 +36,17 @@ export function Today({
   today,
   progress,
   travelMode = false,
+  periodicMode = false,
   onBack,
   onOpenPractice,
   theme,
   onToggleTheme,
 }: Props) {
-  const blocks = travelMode ? blocksForChairYoga() : blocksForDay(day)
+  const blocks = periodicMode
+    ? blocksForPeriodicStretches()
+    : travelMode
+      ? blocksForChairYoga()
+      : blocksForDay(day)
   const totalSteps = blocks.reduce((sum, block) => sum + block.steps.length, 0)
   const done = blocks.reduce(
     (sum, block) => sum + block.steps.filter((step) => progress[step.id]).length,
@@ -54,9 +61,15 @@ export function Today({
           Home
         </button>
         <div className="practice-bar-mid">
-          <strong>{travelMode ? 'Chair Yoga activities' : "Today's activities"}</strong>
+          <strong>
+            {periodicMode
+              ? 'Periodic Stretches'
+              : travelMode
+                ? 'Chair Yoga activities'
+                : "Today's activities"}
+          </strong>
           <span>
-            {!travelMode && day === today ? 'Today · ' : ''}
+            {!travelMode && !periodicMode && day === today ? 'Today · ' : ''}
             {done}/{totalSteps} · {formatDuration(totalSec).replace('~', '')}
           </span>
         </div>
@@ -72,18 +85,26 @@ export function Today({
         <BlocksIcon count={blocks.length} />
         <div>
           <span className="eyebrow">
-            {travelMode ? 'Chair mode · Chair Yoga' : trackLabel(trackForDay(day))}
+            {periodicMode
+              ? 'Periodic Stretches'
+              : travelMode
+                ? 'Chair mode · Chair Yoga'
+                : trackLabel(trackForDay(day))}
           </span>
-          <h1 className="today-title">{travelMode ? 'Chair Yoga' : DAY_LABELS[day]}</h1>
+          <h1 className="today-title">
+            {periodicMode ? 'Periodic Stretches' : travelMode ? 'Chair Yoga' : DAY_LABELS[day]}
+          </h1>
         </div>
       </div>
 
       <p className="week-note">
-        {travelMode
-          ? 'Chair routine — two practice blocks (Practice & Wind-down).'
-          : blocks.length === 2
-            ? 'Sun / Tue / Thu / Sat routine — two practice blocks.'
-            : 'Mon / Wed / Fri routine — one practice block.'}
+        {periodicMode
+          ? 'Periodic Stretches — six 2-minute gentle stretches. Play any activity individually from the home screen.'
+          : travelMode
+            ? 'Chair routine — two practice blocks (Practice & Wind-down).'
+            : blocks.length === 2
+              ? 'Sun / Tue / Thu / Sat routine — two practice blocks.'
+              : 'Mon / Wed / Fri routine — one practice block.'}
       </p>
 
       {blocks.map((block) => (
