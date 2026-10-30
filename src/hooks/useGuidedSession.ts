@@ -115,23 +115,25 @@ export function useGuidedSession({
     const first = steps[state.activityIndex] ?? steps[0]
     if (!first) return
     unlockDing(dingGains)
+    speech.unlock()
     completionAnnounced.current = false
     announcedIndex.current = state.activityIndex
     dispatch({ type: 'START' })
     void announceAndRun(first)
-  }, [announceAndRun, dingGains, state.activityIndex, steps])
+  }, [announceAndRun, dingGains, state.activityIndex, steps, speech])
 
   const startFrom = useCallback(
     (index: number, round?: number) => {
       const step = steps[index]
       if (!step) return
       unlockDing(dingGains)
+      speech.unlock()
       completionAnnounced.current = false
       announcedIndex.current = index
       dispatch({ type: 'START_FROM', index, round: round ?? 1, steps })
       void announceAndRun(step)
     },
-    [announceAndRun, dingGains, steps],
+    [announceAndRun, dingGains, steps, speech],
   )
 
   const pause = useCallback(() => {
@@ -142,10 +144,11 @@ export function useGuidedSession({
   const resume = useCallback(() => {
     if (!currentStep) return
     unlockDing(dingGains)
+    speech.unlock()
     announcedIndex.current = state.activityIndex
     dispatch({ type: 'RESUME' })
     void announceAndRun(currentStep, true)
-  }, [announceAndRun, currentStep, dingGains, state.activityIndex])
+  }, [announceAndRun, currentStep, dingGains, state.activityIndex, speech])
 
   const requestStop = useCallback(() => {
     speech.cancel()
@@ -268,6 +271,7 @@ export function useGuidedSession({
       setVoicePreferences((current) => ({ ...current, rate: clampVoiceRate(rate) }))
     },
     testVoice() {
+      speech.unlock()
       void speech.speak('YOGUIDE voice preview. 10 seconds.', voicePreferences)
     },
     hasSavedSession:
