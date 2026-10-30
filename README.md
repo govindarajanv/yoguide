@@ -17,8 +17,9 @@ npm run preview
 ## Guided session
 
 - Start speaks each activity title and its available time.
-- Practice includes an installed-system voice selector, 0.75×–1.5× speed control,
-  and a voice preview. Preferences are saved locally.
+- A system-voice selector, 0.75×–1.5× speed control, and a voice preview are
+  available on the **home page** (Voice & speed) and in Practice. Preferences
+  are saved locally.
 - Spoken activity instructions contain only the title and available/remaining
   time; written form cues remain visible but are not narrated.
 - **Pick your session** starts guided mode from any section or a single activity;
@@ -48,6 +49,12 @@ The chair and periodic schedules live in
 Edit [`config/app.yaml`](./config/app.yaml) to change the local profile, warning thresholds, or MET values. The configured body weight is **80 kg**.
 
 Voice uses the browser Web Speech API. If it is unavailable, visible timers and cues continue normally.
+
+> **Mobile/iOS troubleshooting:** On iOS, voice (Web Speech) follows the
+> **Silent / Ringer switch**, unlike media such as YouTube. If you hear no voice
+> while your phone volume is high, turn **Silent mode off** (Control Center bell,
+> or the physical switch/Action Button) — and make sure a speech voice is
+> installed under **Settings → Accessibility → Spoken Content → Voices**.
 
 ## Deploy (GitHub Pages)
 

@@ -7,7 +7,7 @@ Status: Implemented
 
 Enhance guided practice with:
 
-- A voice selector, speech-speed control (0.75×–1.5×), and preview button at the top of Practice.
+- A voice selector, speech-speed control (0.75×–1.5×), and preview button, shown on the home page (Voice & speed) and at the top of Practice.
 - Persisted voice preferences in localStorage.
 - Speech limited to activity title and available/remaining time.
 - A floating card showing curated primary and secondary body targets for the active exercise.
