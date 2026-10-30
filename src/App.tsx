@@ -288,6 +288,14 @@ export default function App() {
         theme={theme}
         onToggleTheme={toggleTheme}
       />
+      <VoiceSettings
+        voices={guided.voices}
+        preferences={guided.voicePreferences}
+        available={guided.speechAvailable}
+        onVoiceChange={guided.setVoiceURI}
+        onRateChange={guided.setVoiceRate}
+        onTest={guided.testVoice}
+      />
       </>
     )
   }
