@@ -449,6 +449,7 @@ export const SCHEDULE_STEPS: StepDef[] = [
     sets: 2,
     reps: 135,
     durationSec: 240,
+    dingIntervalSec: 30,
     cue: 'Hips near the wall; legs soft, breath slow.',
   },
   {
