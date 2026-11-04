@@ -25,7 +25,8 @@ npm run preview
 - **Pick your session** starts guided mode from any section or a single activity;
   for Surya Namaskar you can also start from a specific round.
 - Surya Namaskar rings a single bell each round and announces the round number
-  (round-based activities). Other activities ring once at their midpoint.
+  (round-based activities); Leg Up the wall rings a bell every 30 seconds.
+  Other activities ring once at their midpoint.
 - "Muscle groups covered today" lists each body section with the number of
   activities that train it, e.g. **Arms (9)**.
 - Activities up to 30 seconds warn at 3 seconds remaining; longer activities warn at 5 seconds.

@@ -17,6 +17,14 @@ describe('planForDay', () => {
     expect(totalDurationSec(plan)).toBe(2400)
   })
 
+  it('includes Leg Up the wall with a 240s duration and 30s ding interval', () => {
+    const plan = planForDay('mon')
+    const leg = plan.find((s) => s.id === 'leg-up-wall')
+    expect(leg).toBeDefined()
+    expect(leg?.durationSec).toBe(240)
+    expect(leg?.dingIntervalSec).toBe(30)
+  })
+
   it('uses the Sun/Tue/Thu/Sat core track', () => {
     for (const day of ['sun', 'tue', 'thu', 'sat'] as const) {
       const plan = planForDay(day)

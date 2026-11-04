@@ -13,7 +13,7 @@ Personal static SPA that helps follow a ~47-minute daily yoga/fitness schedule s
 - Optional guided mode: voice cues, per-activity countdown, overall active timer, fixed controls, and MET calorie estimate
 - **Pick your session** starts guided mode from any section or single activity; round-based activities (Surya Namaskar) can start from a chosen round
 - **Periodic Stretches** is a separate optional micro-practice (six 2-minute gentle stretches) toggled from the home screen — it is never merged into the daily schedule. Any single activity can be played individually via Pick your session (voice works the same as other sections).
-- Round-based activities ring a **single bell** per round then announce the round number (voice); non-round activities ring once at midpoint
+- Round-based activities ring a **single bell** per round then announce the round number (voice); non-round activities ring once at midpoint. Activities configured with a `dingIntervalSec` (Surya Namaskar per round, Leg Up the wall every 30s) ring on that interval.
 - Voice and speed preferences are local; narration is title + time only (+ round number for Surya). A **Voice & speed** panel (voice selector, speed, Test voice) is shown on the **home page** and in Practice, so audio can be verified before starting.
 - Guided activities show curated general body targets; completed sessions show category charts
 - Manual practice remains available without a timer
