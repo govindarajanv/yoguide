@@ -2,8 +2,9 @@ import type { StepDef } from '../lib/types'
 
 /**
  * Periodic Stretches — a separate, optional micro-practice distinct from the
- * regular daily yoga schedule. All six activities are 2-minute gentle holds.
- * Total duration: 720s (12 minutes).
+ * regular daily yoga schedule. Only "Legs on the wall" is a 2-minute hold;
+ * the other five are 1-minute gentle holds.
+ * Total duration: 420s (7 minutes).
  */
 export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
   {
@@ -21,7 +22,7 @@ export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
     name: 'Suptakapotasana',
     sets: 1,
     reps: 60,
-    durationSec: 120,
+    durationSec: 60,
     cue: 'Lie on your back, cross one ankle over the opposite knee and gently draw the leg in; soften the outer hip and breathe.',
   },
   {
@@ -30,7 +31,7 @@ export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
     name: 'Dandasana',
     sets: 1,
     reps: 60,
-    durationSec: 120,
+    durationSec: 60,
     cue: 'Sit tall with legs extended forward and feet flexed; lengthen the spine and breathe steadily.',
   },
   {
@@ -39,7 +40,7 @@ export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
     name: 'Seated Leg Lift',
     sets: 1,
     reps: 60,
-    durationSec: 120,
+    durationSec: 60,
     cue: 'Sit tall, extend one leg and lift it with control, then lower; keep the core engaged.',
   },
   {
@@ -48,7 +49,7 @@ export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
     name: 'Legs on windows',
     sets: 1,
     reps: 60,
-    durationSec: 120,
+    durationSec: 60,
     cue: 'Prop your legs up on a windowsill or ledge; let the legs rest and breathe deeply.',
   },
   {
@@ -57,7 +58,7 @@ export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
     name: 'Half Forward fold - wall',
     sets: 1,
     reps: 60,
-    durationSec: 120,
+    durationSec: 60,
     cue: 'Hands on the wall, hinge at the hips with a long spine and gentle hamstring stretch.',
   },
 ]
