@@ -549,3 +549,12 @@ export const SCHEDULE_STEPS: StepDef[] = [
     cue: 'Close with gratitude; rise slowly.',
   },
 ]
+
+/**
+ * The daily warm-up block (Neck Rotation through Ankle Circles), reused as an
+ * optional lead-in for the Periodic Stretches micro-practice. Same names,
+ * dosing, and cues as the daily routine.
+ */
+export const WARM_UP_STEPS: StepDef[] = SCHEDULE_STEPS.filter(
+  (step) => step.category === 'warmUp',
+)

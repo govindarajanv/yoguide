@@ -1,4 +1,4 @@
-import { SCHEDULE_STEPS } from '../data/schedule'
+import { SCHEDULE_STEPS, WARM_UP_STEPS } from '../data/schedule'
 import { CHAIR_YOGA_STEPS } from '../data/chairYogaSchedule'
 import { PERIODIC_STRETCHES_STEPS } from '../data/periodicStretchesSchedule'
 import type { Category, DayDiff, DayId, DayTrack, PracticeStep, StepDef } from './types'
@@ -62,8 +62,8 @@ export function planForDay(day: DayId): PracticeStep[] {
   }))
 }
 
-export function chairYogaPlan(): PracticeStep[] {
-  return CHAIR_YOGA_STEPS.map((def) => ({
+function mapDef(def: StepDef): PracticeStep {
+  return {
     id: def.id,
     category: def.category,
     name: def.name ?? '',
@@ -75,7 +75,11 @@ export function chairYogaPlan(): PracticeStep[] {
     dingIntervalSec: def.dingIntervalSec,
     dingGain: def.dingGain,
     finalWarningSec: def.finalWarningSec,
-  }))
+  }
+}
+
+export function chairYogaPlan(): PracticeStep[] {
+  return CHAIR_YOGA_STEPS.map(mapDef)
 }
 
 export function totalDurationSec(steps: PracticeStep[]): number {
@@ -120,24 +124,18 @@ export function blocksForChairYoga(): PlanBlock[] {
   ]
 }
 
-export function periodicStretchesPlan(): PracticeStep[] {
-  return PERIODIC_STRETCHES_STEPS.map((def) => ({
-    id: def.id,
-    category: def.category,
-    name: def.name ?? '',
-    sets: def.sets,
-    reps: def.reps,
-    durationSec: def.durationSec,
-    cue: def.cue,
-    rounds: def.rounds,
-    dingIntervalSec: def.dingIntervalSec,
-    dingGain: def.dingGain,
-    finalWarningSec: def.finalWarningSec,
-  }))
+/**
+ * Periodic Stretches plan. When `includeWarmUp` is true (the default), the
+ * daily warm-up block is prepended so the retreats start with warm-up before
+ * the gentle stretches.
+ */
+export function periodicStretchesPlan(includeWarmUp = true): PracticeStep[] {
+  const warmUpSteps = includeWarmUp ? WARM_UP_STEPS.map(mapDef) : []
+  return [...warmUpSteps, ...PERIODIC_STRETCHES_STEPS.map(mapDef)]
 }
 
-export function blocksForPeriodicStretches(): PlanBlock[] {
-  return [{ label: '', name: 'Periodic Stretches', steps: periodicStretchesPlan() }]
+export function blocksForPeriodicStretches(includeWarmUp = true): PlanBlock[] {
+  return [{ label: '', name: 'Periodic Stretches', steps: periodicStretchesPlan(includeWarmUp) }]
 }
 
 export function formatDuration(totalSec: number): string {

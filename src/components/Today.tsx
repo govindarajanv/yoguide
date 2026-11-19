@@ -20,6 +20,7 @@ type Props = {
   progress: DayProgress
   travelMode?: boolean
   periodicMode?: boolean
+  periodicWarmUp?: boolean
   onBack: () => void
   onOpenPractice: () => void
   theme: Theme
@@ -37,13 +38,14 @@ export function Today({
   progress,
   travelMode = false,
   periodicMode = false,
+  periodicWarmUp = true,
   onBack,
   onOpenPractice,
   theme,
   onToggleTheme,
 }: Props) {
   const blocks = periodicMode
-    ? blocksForPeriodicStretches()
+    ? blocksForPeriodicStretches(periodicWarmUp)
     : travelMode
       ? blocksForChairYoga()
       : blocksForDay(day)
@@ -99,7 +101,7 @@ export function Today({
 
       <p className="week-note">
         {periodicMode
-          ? 'Periodic Stretches — six 2-minute gentle stretches. Play any activity individually from the home screen.'
+          ? 'Periodic Stretches — optional daily warm-up followed by gentle stretches (Legs on the wall is 2 minutes, the rest 1 minute). Play any activity individually from the home screen.'
           : travelMode
             ? 'Chair routine — two practice blocks (Practice & Wind-down).'
             : blocks.length === 2

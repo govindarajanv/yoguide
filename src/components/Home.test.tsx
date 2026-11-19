@@ -23,8 +23,10 @@ describe('Home Chair Mode Toggle', () => {
     guidedCalories: 0,
     travelMode: false,
     periodicMode: false,
+    periodicWarmUp: true,
     onToggleTravelMode: vi.fn(),
     onTogglePeriodicMode: vi.fn(),
+    onTogglePeriodicWarmUp: vi.fn(),
     onStartGuided: vi.fn(),
     onStartFrom: vi.fn(),
     onOpenGuided: vi.fn(),
@@ -90,5 +92,27 @@ describe('Home Chair Mode Toggle', () => {
     expect(screen.getByText('PERIODIC STRETCHES')).toBeInTheDocument()
     expect(screen.getByText('Wall · chair · windowsill')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Periodic Stretches activities' })).toBeInTheDocument()
+  })
+
+  it('hides the warm-up toggle outside periodic mode', () => {
+    render(<Home {...baseProps} />)
+    expect(
+      screen.queryByRole('switch', { name: 'Toggle periodic warm-up' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('calls onTogglePeriodicWarmUp when clicking the warm-up toggle', () => {
+    const onTogglePeriodicWarmUp = vi.fn()
+    render(
+      <Home
+        {...baseProps}
+        periodicMode={true}
+        onTogglePeriodicWarmUp={onTogglePeriodicWarmUp}
+      />,
+    )
+    const toggle = screen.getByRole('switch', { name: 'Toggle periodic warm-up' })
+    expect(toggle).toHaveAttribute('aria-checked', 'true')
+    fireEvent.click(toggle)
+    expect(onTogglePeriodicWarmUp).toHaveBeenCalledTimes(1)
   })
 })

@@ -99,6 +99,7 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   'Seated Leg Lift': { primary: 'Quadriceps & hip flexors', secondary: ['Core', 'Knees'] },
   'Legs on windows': { primary: 'Hamstrings & calves', secondary: ['Lower back', 'Circulation'] },
   'Half Forward fold - wall': { primary: 'Hamstrings', secondary: ['Spine', 'Shoulders', 'Calves'] },
+  'Ankle Front and Back': { primary: 'Ankles & feet', secondary: ['Shins', 'Calves'] },
 }
 
 const CATEGORY_FALLBACKS: Record<Category, ActivityBenefit> = {

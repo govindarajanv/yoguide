@@ -3,8 +3,9 @@ import type { StepDef } from '../lib/types'
 /**
  * Periodic Stretches — a separate, optional micro-practice distinct from the
  * regular daily yoga schedule. Only "Legs on the wall" is a 2-minute hold;
- * the other five are 1-minute gentle holds.
- * Total duration: 420s (7 minutes).
+ * the other six are 1-minute gentle holds. The schedule builder can prepend
+ * the daily warm-up (see WARM_UP_STEPS in schedule.ts) as an optional lead-in.
+ * Total duration: 480s (8 minutes).
  */
 export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
   {
@@ -60,5 +61,14 @@ export const PERIODIC_STRETCHES_STEPS: StepDef[] = [
     reps: 60,
     durationSec: 60,
     cue: 'Hands on the wall, hinge at the hips with a long spine and gentle hamstring stretch.',
+  },
+  {
+    id: 'periodic-ankle-front-back',
+    category: 'coolDown',
+    name: 'Ankle Front and Back',
+    sets: 1,
+    reps: 60,
+    durationSec: 60,
+    cue: 'Point and flex the ankles alternately; keep the movement slow and controlled.',
   },
 ]

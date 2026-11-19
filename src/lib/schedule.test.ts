@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
+import { WARM_UP_STEPS } from '../data/schedule'
+import { PERIODIC_STRETCHES_STEPS } from '../data/periodicStretchesSchedule'
 import {
   blocksForChairYoga,
   blocksForDay,
   chairYogaPlan,
   diffVsYesterday,
+  periodicStretchesPlan,
   planForDay,
   previousDay,
   totalDurationSec,
@@ -78,6 +81,34 @@ describe('diffVsYesterday', () => {
   it('has no core diff between Saturday and Sunday (same track)', () => {
     const diffs = diffVsYesterday('sun')
     expect(diffs.some((d) => d.category === 'core')).toBe(false)
+  })
+})
+
+describe('periodicStretchesPlan', () => {
+  it('prepends the daily warm-up by default', () => {
+    const plan = periodicStretchesPlan()
+    expect(plan).toHaveLength(WARM_UP_STEPS.length + PERIODIC_STRETCHES_STEPS.length)
+    expect(plan[0]?.name).toBe('Neck Rotation')
+    expect(plan[WARM_UP_STEPS.length - 1]?.name).toBe('Ankle Circles')
+    expect(plan[WARM_UP_STEPS.length]?.name).toBe('Legs on the wall')
+  })
+
+  it('starts with stretches when warm-up is disabled', () => {
+    const plan = periodicStretchesPlan(false)
+    expect(plan).toHaveLength(PERIODIC_STRETCHES_STEPS.length)
+    expect(plan[0]?.name).toBe('Legs on the wall')
+  })
+
+  it('includes Ankle Front and Back as a 60s stretch', () => {
+    const plan = periodicStretchesPlan(false)
+    const ankle = plan.find((s) => s.name === 'Ankle Front and Back')
+    expect(ankle).toBeDefined()
+    expect(ankle?.durationSec).toBe(60)
+  })
+
+  it('totals 807s with warm-up and 480s without', () => {
+    expect(totalDurationSec(periodicStretchesPlan())).toBe(807)
+    expect(totalDurationSec(periodicStretchesPlan(false))).toBe(480)
   })
 })
 

@@ -39,9 +39,11 @@ npm run preview
 ## Alternate sections
 
 - **Chair mode** (Chair Yoga) is a separate ~20-minute chair routine.
-- **Periodic Stretches** is a separate optional micro-practice of six 2-minute
-  gentle stretches, toggled from the home screen. Each activity can be played
-  individually via **Pick your session** with the same voice cues as other sections.
+- **Periodic Stretches** is a separate optional micro-practice, toggled from
+  the home screen. It starts with the daily warm-up (optional, switchable off)
+  followed by seven gentle stretches — only **Legs on the wall** is 2 minutes,
+  the rest are 1 minute. Each activity can be played individually via
+  **Pick your session** with the same voice cues as other sections.
 
 The chair and periodic schedules live in
 [`src/data/chairYogaSchedule.ts`](./src/data/chairYogaSchedule.ts) and

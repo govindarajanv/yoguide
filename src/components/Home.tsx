@@ -33,8 +33,10 @@ type Props = {
   guidedCalories: number
   travelMode: boolean
   periodicMode: boolean
+  periodicWarmUp: boolean
   onToggleTravelMode: () => void
   onTogglePeriodicMode: () => void
+  onTogglePeriodicWarmUp: () => void
   onStartGuided: () => void
   onStartFrom: (index: number, round?: number) => void
   onOpenGuided: () => void
@@ -60,8 +62,10 @@ export function Home({
   guidedCalories,
   travelMode,
   periodicMode,
+  periodicWarmUp,
   onToggleTravelMode,
   onTogglePeriodicMode,
+  onTogglePeriodicWarmUp,
   onStartGuided,
   onStartFrom,
   onOpenGuided,
@@ -126,6 +130,27 @@ export function Home({
               {periodicMode ? 'ON' : 'OFF'}
             </span>
           </button>
+          {periodicMode && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={periodicWarmUp}
+              aria-label="Toggle periodic warm-up"
+              className={`mode-toggle ${periodicWarmUp ? 'mode-toggle-active' : ''}`}
+              onClick={onTogglePeriodicWarmUp}
+              title={
+                periodicWarmUp
+                  ? 'Start Periodic Stretches without the warm-up'
+                  : 'Start Periodic Stretches with the daily warm-up'
+              }
+            >
+              <span className="mode-toggle-icon">🔥</span>
+              <span className="mode-toggle-label">Warm-up</span>
+              <span className={`mode-toggle-badge ${periodicWarmUp ? 'badge-on' : 'badge-off'}`}>
+                {periodicWarmUp ? 'ON' : 'OFF'}
+              </span>
+            </button>
+          )}
           {!travelMode && !periodicMode && (
             <label className="day-select">
               <span className="day-select-label">Practice day</span>
@@ -159,7 +184,7 @@ export function Home({
           {periodicMode ? 'Periodic Stretches' : travelMode ? 'Chair Yoga' : DAY_LABELS[day]}
           <span className="home-track">
             {periodicMode
-              ? 'Periodic Stretches · 12 min'
+              ? `Periodic Stretches · ${formatDuration(totalSec).replace('~', '')}${periodicWarmUp ? ' · warm-up on' : ' · stretches only'}`
               : travelMode
                 ? 'Chair Yoga · 20 min'
                 : trackLabel(track)}

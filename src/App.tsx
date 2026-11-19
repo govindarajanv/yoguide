@@ -36,6 +36,10 @@ import {
   planForDay,
   totalDurationSec,
 } from './lib/schedule'
+import {
+  loadPeriodicStretchesPreferences,
+  savePeriodicStretchesPreferences,
+} from './lib/periodicStretchesPreferences'
 import { buildCategorySummaries } from './lib/sessionAnalytics'
 
 type View = 'home' | 'practice' | 'week' | 'today'
@@ -49,6 +53,9 @@ export default function App() {
   const [previewDay, setPreviewDay] = useState(today)
   const [travelMode, setTravelMode] = useState<boolean>(false)
   const [periodicMode, setPeriodicMode] = useState<boolean>(false)
+  const [periodicIncludeWarmUp, setPeriodicIncludeWarmUp] = useState<boolean>(
+    () => loadPeriodicStretchesPreferences().includeWarmUp,
+  )
   const mode: Mode = periodicMode ? 'periodic' : travelMode ? 'chair' : 'standard'
 
   const activeDateKey = useMemo(
@@ -62,7 +69,10 @@ export default function App() {
   const [complete, setComplete] = useState(() => isSessionComplete(activeDateKey))
 
   const chairSteps = useMemo(() => chairYogaPlan(), [])
-  const periodicSteps = useMemo(() => periodicStretchesPlan(), [])
+  const periodicSteps = useMemo(
+    () => periodicStretchesPlan(periodicIncludeWarmUp),
+    [periodicIncludeWarmUp],
+  )
   const regularSteps = useMemo(() => planForDay(selectedDay), [selectedDay])
   const practiceSteps =
     mode === 'periodic' ? periodicSteps : mode === 'chair' ? chairSteps : regularSteps
@@ -171,6 +181,15 @@ export default function App() {
     guided.reset()
   }, [guided])
 
+  const handleTogglePeriodicWarmUp = useCallback(() => {
+    setPeriodicIncludeWarmUp((prev) => {
+      const next = !prev
+      savePeriodicStretchesPreferences({ includeWarmUp: next })
+      return next
+    })
+    guided.reset()
+  }, [guided])
+
   let content
   if (view === 'practice') {
     content = (
@@ -226,6 +245,7 @@ export default function App() {
         progress={progress}
         travelMode={mode === 'chair'}
         periodicMode={mode === 'periodic'}
+        periodicWarmUp={periodicIncludeWarmUp}
         onBack={() => setView('home')}
         onOpenPractice={() => setView('practice')}
         theme={theme}
@@ -270,8 +290,10 @@ export default function App() {
         guidedCalories={guided.calories}
         travelMode={mode === 'chair'}
         periodicMode={mode === 'periodic'}
+        periodicWarmUp={periodicIncludeWarmUp}
         onToggleTravelMode={handleToggleTravelMode}
         onTogglePeriodicMode={handleTogglePeriodicMode}
+        onTogglePeriodicWarmUp={handleTogglePeriodicWarmUp}
         onStartGuided={startGuided}
         onStartFrom={startFromGuided}
         onOpenGuided={() => setView('practice')}
