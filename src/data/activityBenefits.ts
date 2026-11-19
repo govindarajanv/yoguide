@@ -85,6 +85,7 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   'Toe Touches': { primary: 'Hamstrings', secondary: ['Lower back', 'Spine', 'Hips'] },
   'Ardha Chandrasana': { primary: 'Side body & balance', secondary: ['Hips', 'Spine', 'Chest'] },
   Trikonasana: { primary: 'Hamstrings & side body', secondary: ['Hips', 'Spine', 'Chest'] },
+  Dandasana: { primary: 'Seated posture', secondary: ['Spine', 'Hamstrings', 'Core'] },
   Tadasana: { primary: 'Posture & alignment', secondary: ['Spine', 'Breath', 'Core'] },
   'Hand Stretching': { primary: 'Hands & wrists', secondary: ['Fingers', 'Forearms'] },
   'Rotator Cuff Stretch': { primary: 'Rotator cuff', secondary: ['Shoulders', 'Upper back'] },
@@ -94,7 +95,7 @@ const BENEFITS: Record<string, ActivityBenefit> = {
   'Naadi Shuddhi': { primary: 'Breath control', secondary: ['Focus', 'Diaphragm', 'Nervous system'] },
   'Slow Breathing': { primary: 'Breath control & relaxation', secondary: ['Nervous system', 'Diaphragm'] },
   'Legs on the wall': { primary: 'Hamstrings & calves', secondary: ['Lower back', 'Circulation'] },
-  'Legs on the corner': { primary: 'Inner thighs', secondary: ['Hamstrings', 'Hips', 'Lower back'] },
+  
   'Seated Leg Lift': { primary: 'Quadriceps & hip flexors', secondary: ['Core', 'Knees'] },
   'Legs on windows': { primary: 'Hamstrings & calves', secondary: ['Lower back', 'Circulation'] },
   'Half Forward fold - wall': { primary: 'Hamstrings', secondary: ['Spine', 'Shoulders', 'Calves'] },
